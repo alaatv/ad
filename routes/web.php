@@ -11,6 +11,16 @@
 |
 */
 
-$router->get('/', function () use ($router) {
+
+use App\Http\Controllers\HomeController;
+
+$router->get('/version', function () use ($router) {
     return $router->app->version();
 });
+
+$router->get('/key', function() {
+    return str_random(32);
+});
+
+//$router->get('/', [HomeController::class , 'index']);
+$router->get('/', 'HomeController@index');
