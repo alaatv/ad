@@ -11,16 +11,18 @@
 |
 */
 
+//$router->get('/phpinfo', function () use ($router) {
+//    return phpinfo();
+//});
+//
+//$router->get('/version', function () use ($router) {
+//    return $router->app->version();
+//});
+//
+//$router->get('/key', function() {
+//    return str_random(32);
+//});
 
-use App\Http\Controllers\HomeController;
-
-$router->get('/version', function () use ($router) {
-    return $router->app->version();
-});
-
-$router->get('/key', function() {
-    return str_random(32);
-});
-
-//$router->get('/', [HomeController::class , 'index']);
+//$router->get('/', [HomeController::class , 'index']);  Not working in lumen
 $router->get('/', 'HomeController@index');
+$router->post('/fetchAds', 'HomeController@fetchAds');

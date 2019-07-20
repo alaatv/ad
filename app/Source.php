@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
-class Add extends Model
+/**
+ * @property mixed fetch_url
+ * @property mixed id
+ */
+class Source extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -17,7 +21,16 @@ class Add extends Model
      */
     protected $fillable = [
         'name',
-        'image',
-        'link',
+        'display_name',
+        'description',
+        'site',
+        'fetch_url',
+        'enable',
     ];
+
+    protected $dates = ['deleted_at'];
+
+    public function ads(){
+        return $this->hasMany(Ad::class);
+    }
 }

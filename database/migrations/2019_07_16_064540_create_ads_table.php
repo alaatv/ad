@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAddsTable extends Migration
+class CreateAdsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,16 +14,24 @@ class CreateAddsTable extends Migration
      */
     public function up()
     {
-        Schema::create('adds', function (Blueprint $table) {
-            $table->bigIncrements('id');
+        Schema::create('ads', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('source_id')->nullable()->comment('منبع تبلیغ');
             $table->string('name')->nullable()->comment('نام تبلیغ');
             $table->string('image')->nullable()->comment('مسیر عکس تبلیغ');
             $table->string('link')->nullable()->comment('لینک تبلیغ');
+            $table->tinyInteger('enable')->default(1)->comment('فعال یا غیرفعال');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('source_id')
+                ->references('id')
+                ->on('sources')
+                ->onDelete('cascade')
+                ->onupdate('cascade');
         });
 
-        DB::statement("ALTER TABLE `adds` comment 'تبلیغ ها'");
+        DB::statement("ALTER TABLE `ads` comment 'تبلیغ ها'");
     }
 
     /**
@@ -33,6 +41,6 @@ class CreateAddsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('adds');
+        Schema::dropIfExists('ads');
     }
 }
