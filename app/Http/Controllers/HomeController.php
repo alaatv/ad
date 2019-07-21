@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Repo;
 use App\Traits\HTTPRequestTrait;
-use Illuminate\{Http\JsonResponse, Http\Request, Http\Response};
+use Illuminate\{Http\JsonResponse, Http\Request, Http\Response, Support\Facades\DB};
 use \App\Classes\Response as myResponse ;
 
 class HomeController extends Controller
@@ -38,5 +38,28 @@ class HomeController extends Controller
                 'data'   =>   $ads
              ]
         ]);
+    }
+
+    public function fetchAds(Request $request){
+        //ToDo : security : any one can update Chibekhoonam ads
+        $ad = Repo::getRecords('ads', ['*'], ['foreign_id'=>$request->ad_id])->first();
+
+        if(!isset($ad)){
+            return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'), Response::HTTP_NOT_FOUND);
+        }
+
+        $update = DB::table('ads')->update([
+           'name'   => $request->name,
+           'image'   => $request->link,
+           'link'   => $request->image,
+        ]);
+
+        if($update){
+            return response()->json([
+                'message'   =>  'ad has been updated successfully'
+            ]);
+        }else{
+            return response()->json($this->setErrorResponse(myResponse::AD_UPDATE_DATABASE_ERROR, 'Database error on updating ad'), Response::HTTP_SERVICE_UNAVAILABLE);
+        }
     }
 }
