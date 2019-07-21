@@ -16,7 +16,7 @@ class Fetch extends Model
         'first_item_id',
         'page',
         'per_page',
-        'done',
+        'fetched',
     ];
 
     protected $dates = ['deleted_at'];

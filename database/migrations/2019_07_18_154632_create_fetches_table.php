@@ -20,7 +20,7 @@ class CreateFetchesTable extends Migration
             $table->integer('first_item_id')->nullable()->comment('آی دی اولین آیتم فچ شده');
             $table->integer('page')->nullable()->comment('شماره صفحه ای که فچ شده');
             $table->integer('per_page')->nullable()->comment('تعداد آیتم های فچ شده در هر صفحه');
-            $table->tinyInteger('done')->default(1)->comment('موفق بوده یا خیر');
+            $table->integer('fetched')->nullable()->comment('تعداد فچ شده');
             $table->timestamps();
             $table->softDeletes();
 

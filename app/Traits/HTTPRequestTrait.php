@@ -19,7 +19,7 @@ trait HTTPRequestTrait
         }
         try {
             $res = $client->request($method, $path, [
-                'form_params' => $request->all() ,
+                'query' => $request->all() ,
                 'headers' => $headers
             ]);
         } catch (GuzzleException $e) {
