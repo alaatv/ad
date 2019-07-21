@@ -13,6 +13,7 @@ class Ad extends Model
      */
     protected $fillable = [
         'source_id',
+        'foreign_id',
         'name',
         'image',
         'link',

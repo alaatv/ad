@@ -14,16 +14,16 @@ class Repo
     /**
      * @param string $table
      * @param array $columns
-     * @param array $parameters
+     * @param array $filters
      * @return Builder
      */
-    public static function getRecords(string $table, array $columns , array $parameters):Builder{
+    public static function getRecords(string $table, array $columns , array $filters):Builder{
         if(in_array('*' , $columns))
             $columns = '*';
 
         $records = DB::table($table)->select($columns);
 
-        self::filter($records, $parameters);
+        self::filter($records, $filters);
 
         return $records;
     }

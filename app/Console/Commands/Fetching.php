@@ -89,14 +89,19 @@ class Fetching extends Command
      */
     private function doFetching(string $fetchUrl,stdClass $source): array
     {
-        $page = 1;
+        if ($this->confirm('Do you want to fetch all of items?', true)) {
+            $page = 1;
+        }else{
+            $page = $this->getPageToFetch($source);
+        }
+        $this->info('Start fetching from page '.$page);
+
         $failedPages = 0;
         do {
             $counter = 0;
             [$fetchDone , $items , $perPage , $nextPage , $message] = $this->fetchAd($fetchUrl, $page);
             if ($fetchDone) {
-                if (empty($items))
-                {
+                if (empty($items)) {
                     $this->info("No $items fetched on request for page $page");
                     $this->info("\n");
                     continue;
@@ -105,7 +110,8 @@ class Fetching extends Command
                 $this->info('Inserting '.count($items).' items');
                 $bar = $this->output->createProgressBar(count($items));
                 foreach ($items as $key => $item) {
-                    if($this->isValidItem($item)){
+                    if($this->isValidItem($item) && $this->isInsertable($this->makeAdForeignId($source->id, optional($item)->id))){
+//                  if(true){
                         $this->insertAdRecord($source, $item);
                         $bar->advance();
                         $counter++;
@@ -140,6 +146,7 @@ class Fetching extends Command
     {
         Repo::insertRecord('ads', [
             'source_id' => $source->id,
+            'foreign_id' => $this->makeAdForeignId($source->id , optional($item)->id),
             'name' => optional($item)->name,
             'image' => optional($item)->image,
             'link' => optional($item)->link,
@@ -155,7 +162,7 @@ class Fetching extends Command
      * @param int $perPage
      * @param int $done
      */
-    private function insertFetchLog(stdClass $source, $firstItem, int $page,  $perPage, int $done): void
+    private function insertFetchLog(stdClass $source, $firstItem, int $page, int $perPage, int $done): void
     {
         Repo::insertRecord('fetches', [
             'source_id' => $source->id,
@@ -207,6 +214,32 @@ class Fetching extends Command
      */
     private function isValidItem($item):bool
     {
-        return isset($item->name) && isset($item->link) && isset($item->image);
+        return isset($item->id) && isset($item->name) && isset($item->link) && isset($item->image);
+    }
+
+    private function makeAdForeignId(int $sourceId, int $itemId):string
+    {
+        return 'source'.$sourceId.'_'.$itemId;
+    }
+
+
+    private function isInsertable(string $adId):bool
+    {
+        $ad = Repo::getRecords('ads', ['id'] ,['foreign_id'=>$adId])->first();
+        return (isset($ad))?true:false;
+    }
+
+    /**
+     * @param stdClass $source
+     * @return int
+     */
+    private function getPageToFetch(stdClass $source):int
+    {
+        $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id ])->where('fetched' , '>' , 0)->orderByDesc('page')->first();
+        $page = $lastFetch->page;
+        if ($lastFetch->per_page == $lastFetch->fetched) {
+            $page = $lastFetch->page + 1;
+        }
+        return $page;
     }
 }
