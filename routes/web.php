@@ -25,4 +25,4 @@
 
 //$router->get('/', [HomeController::class , 'index']);  Not working in lumen
 $router->get('/', 'HomeController@index');
-$router->post('/fetchAds', 'HomeController@fetchAds');
+$router->post('/fetchAd', 'HomeController@fetchAds');

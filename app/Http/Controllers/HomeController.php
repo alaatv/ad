@@ -40,7 +40,7 @@ class HomeController extends Controller
         ]);
     }
 
-    public function fetchAds(Request $request){
+    public function fetchAd(Request $request){
         //ToDo : security : any one can update Chibekhoonam ads
         $ad = Repo::getRecords('ads', ['*'], ['foreign_id'=>$request->ad_id])->first();
 
