@@ -32,3 +32,4 @@ $router->get('/uuid', function() {
 $router->get('/', 'HomeController@index');
 $router->post('/fetchAd', 'HomeController@fetchAds');
 $router->get('ad/{UUID}/click', 'HomeController@adClick');
+$router->get('debug', 'HomeController@debug');

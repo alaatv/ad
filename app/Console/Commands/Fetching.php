@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Repositories\Repo;
 use App\Traits\HTTPRequestTrait;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Console\Command;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -112,8 +114,8 @@ class Fetching extends Command
                 $bar = $this->output->createProgressBar(count($items));
                 foreach ($items as $key => $item) {
                     if($this->isValidItem($item) && $this->isInsertable($this->makeAdForeignId($source->id, optional($item)->id))){
-//                  if(true){
                         $this->insertAdRecord($source, $item);
+                        $this->storeAdPic(optional($item)->image);
                         $bar->advance();
                         $counter++;
                     }
@@ -243,5 +245,28 @@ class Fetching extends Command
             $page = $lastFetch->page + 1;
         }
         return $page;
+    }
+
+    /**
+     * @param string $picUrl
+     * @return bool
+     */
+    private function storeAdPic(string $picUrl): bool
+    {
+        if(!isset($picUrl))
+            return false;
+
+        $client = new Client();
+        $basePath = explode('app/', __DIR__)[0];
+        $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename($picUrl);
+        $filePath = fopen($pathToSave, 'w');
+        try {
+            $res = $client->request('GET', $picUrl, [
+                'sink' => $filePath,
+            ]);
+
+            return true;
+        } catch (GuzzleException $e) {
+        }
     }
 }

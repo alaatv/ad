@@ -6,6 +6,8 @@ use App\Classes\AdLinkGenerator;
 use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
 use App\Traits\HTTPRequestTrait;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\{Contracts\Pagination\LengthAwarePaginator,
     Http\JsonResponse,
     Http\Request,
@@ -17,6 +19,22 @@ use \App\Classes\Response as myResponse ;
 class HomeController extends Controller
 {
     use HTTPRequestTrait;
+
+    public function debug(Request $request){
+        $client  = new Client();
+        $url= 'https://cdn.alaatv.com/upload/images/product/A58_20190513140213.jpg';
+        $basePath =  explode('app/', __DIR__)[0];
+        $pathToSave= $basePath.'storage/app/public/images/ads/'.basename($url);
+        $filePath = fopen($pathToSave,'w');
+        try {
+            $res = $client->request('GET', $url, [
+                'sink' => $filePath,
+            ]);
+        } catch (GuzzleException $e) {
+        }
+
+       dd($res);
+    }
 
     /**
      * @param Request $request
