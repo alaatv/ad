@@ -36,12 +36,12 @@ class HomeController extends Controller
         }
 
         if($request->has('source')){
-            $sourcesName = explode(",", $request->get('source'));
-            $sourcesName = array_filter($sourcesName);
+            $sourceNames = explode(",", $request->get('source'));
+            $sourceNames = array_filter($sourceNames);
 
-            $sources = SourceRepo::getValidSourceViaUser($sourcesName, $customer->id)->get();
+            $sources = SourceRepo::getValidSourceViaUser($sourceNames, $customer->id)->get();
         }else{
-            $sources = SourceRepo::getValidSourceViaContract($customer)->get();
+            $sources = SourceRepo::getValidSourceViaContract($customer->id)->get();
         }
 
         if($sources->isEmpty()){
