@@ -24,9 +24,9 @@ use Illuminate\Support\Str;
 //$router->get('/key', function() {
 //    return str_random(32);
 //});
-$router->get('/uuid', function() {
-        return Str::uuid();
-});
+//$router->get('/uuid', function() {
+//        return Str::uuid();
+//});
 
 //$router->get('/', [HomeController::class , 'index']);  Not working in lumen
 $router->get('/', 'HomeController@index');

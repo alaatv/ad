@@ -5,8 +5,6 @@ namespace App\Console\Commands;
 use App\Repositories\Repo;
 use App\Traits\HTTPRequestTrait;
 use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Console\Command;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -114,8 +112,12 @@ class Fetching extends Command
                 $bar = $this->output->createProgressBar(count($items));
                 foreach ($items as $key => $item) {
                     if($this->isValidItem($item) && $this->isInsertable($this->makeAdForeignId($source->id, optional($item)->id))){
+                        [$storeResult,$picPath] =  $this->storeAdPic(optional($item)->image);
+                        if($storeResult){
+                            $item->image = $picPath;
+                        }
+
                         $this->insertAdRecord($source, $item);
-                        $this->storeAdPic(optional($item)->image);
                         $bar->advance();
                         $counter++;
                     }
@@ -249,24 +251,22 @@ class Fetching extends Command
 
     /**
      * @param string $picUrl
-     * @return bool
+     * @return array
      */
-    private function storeAdPic(string $picUrl=null): bool
+    private function storeAdPic(string $picUrl=null): array
     {
         if(!isset($picUrl))
-            return false;
+            return [false, null];
 
-        $client = new Client();
         $basePath = explode('app/', __DIR__)[0];
         $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename($picUrl);
         $filePath = fopen($pathToSave, 'w');
-        try {
-            $res = $client->request('GET', $picUrl, [
-                'sink' => $filePath,
-            ]);
 
-            return true;
-        } catch (GuzzleException $e) {
+        $response = $this->sendRequest($picUrl, 'GET', [], [] , $filePath);
+        if($response['statusCode'] == Response::HTTP_OK){
+            return [true,$pathToSave];
         }
+        return [false, null];
+
     }
 }

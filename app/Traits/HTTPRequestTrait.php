@@ -5,23 +5,31 @@ namespace App\Traits;
 
 
 use GuzzleHttp\{Client, Exception\GuzzleException};
-use Illuminate\{Http\Request, Support\Facades\Log};
+use Illuminate\{Support\Facades\Log};
 use PHPUnit\Framework\Exception;
 
 trait HTTPRequestTrait
 {
-    protected function sendRequest(string $path, string $method, array $parameters = [] , array $headers = [])
+    protected function sendRequest(string $path, string $method, array $parameters = [] , array $headers = [] ,  $sink=null)
     {
         $client  = new Client();
-        $request = new Request();
-        foreach ($parameters as $key => $parameter) {
-            $request->offsetSet($key, $parameter);
+
+        $options = [];
+
+        if(!empty($parameters)){
+            $options['query'] = $parameters;
         }
+
+        if(!empty($headers)){
+            $options['headers'] = $headers;
+        }
+
+        if(isset($sink)){
+            $options['sink'] = $sink;
+        }
+
         try {
-            $res = $client->request($method, $path, [
-                'query' => $request->all() ,
-                'headers' => $headers
-            ]);
+            $res = $client->request($method, $path, $options);
         } catch (GuzzleException $e) {
             Log::error($e->getMessage());
             throw new Exception($e->getMessage());
