@@ -43,22 +43,20 @@ trait HTTPRequestTrait
 
     protected function setErrorResponse(int $responseCode, string $responseText , array $extraInfo = []): array
     {
-        $response = [
+        return [
             'error' => [
                 'code' => $responseCode,
                 'message' => $responseText,
                 'extraInfo' => $extraInfo,
             ]
         ];
-        return $response;
     }
 
     protected function setSuccessResponse(string $responseText , array $data= []): array
     {
-        $response = [
+        return [
             'message'   =>  $responseText,
             'data'      => $data
         ];
-        return $response;
     }
 }
