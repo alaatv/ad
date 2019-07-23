@@ -251,7 +251,7 @@ class Fetching extends Command
      * @param string $picUrl
      * @return bool
      */
-    private function storeAdPic(string $picUrl): bool
+    private function storeAdPic(string $picUrl=null): bool
     {
         if(!isset($picUrl))
             return false;
