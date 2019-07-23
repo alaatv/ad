@@ -225,7 +225,7 @@ class Fetching extends Command
 
     private function makeAdForeignId(int $sourceId, int $itemId):string
     {
-        return 'source'.$sourceId.'_'.$itemId;
+        return 's'.$sourceId.'_'.$itemId;
     }
 
 
