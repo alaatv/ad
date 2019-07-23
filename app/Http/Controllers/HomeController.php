@@ -59,9 +59,9 @@ class HomeController extends Controller
         }
 
         $update = DB::table('ads')->update([
-           'name'   => $request->get('name' , $ad->name),
-           'image'  => $request->get('link' , $ad->link),
-           'link'   => $request->get('image' , $ad->image),
+           'name'   => $request->get('name' , optional($ad)->name),
+           'image'  => $request->get('link' , optional($ad)->link),
+           'link'   => $request->get('image' , optional($ad)->image),
         ]);
 
         if($update){
