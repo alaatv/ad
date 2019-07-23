@@ -35,14 +35,13 @@ class HomeController extends Controller
             return response()->json($this->setErrorResponse(myResponse::USER_NOT_FOUND, 'User not found'), Response::HTTP_NOT_FOUND);
         }
 
+        $sourceNames = [];
         if($request->has('source')){
             $sourceNames = explode(",", $request->get('source'));
             $sourceNames = array_filter($sourceNames);
-
-            $sources = SourceRepo::getValidSourceViaUser($sourceNames, $customer->id)->get();
-        }else{
-            $sources = SourceRepo::getValidSourceViaContract($customer->id)->get();
         }
+
+        $sources = SourceRepo::getValidSource($customer->id,$sourceNames)->get();
 
         if($sources->isEmpty()){
             return response()->json($this->setErrorResponse(myResponse::NO_VALID_SOURCE_FOUND_FOR_CUSTOMER, 'NO valid source found for this customer'), Response::HTTP_NOT_FOUND);
