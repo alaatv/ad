@@ -30,15 +30,14 @@ class HomeController extends Controller
     public function index(Request $request , AdLinkGenerator $adLinkGenerator){
         $numberOfAds = $request->get('numberOfAds' , 6);
         $customerUUID = $request->get('UUID');
+        $sourceNames = $request->get('source' , []);
         $customer = Repo::getRecords('users', ['*'], ['UUID'=>$customerUUID])->first();
         if(!isset($customer)){
             return response()->json($this->setErrorResponse(myResponse::USER_NOT_FOUND, 'User not found'), Response::HTTP_NOT_FOUND);
         }
 
-        $sourceNames = [];
-        if($request->has('source')){
-            $sourceNames = explode(",", $request->get('source'));
-            $sourceNames = array_filter($sourceNames);
+        if(is_string($sourceNames)){
+            $sourceNames = convertTagStringToArray($sourceNames);
         }
 
         $sources = SourceRepo::getValidSource($customer->id,$sourceNames)->get();
