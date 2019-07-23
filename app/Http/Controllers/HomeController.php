@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Classes\AdLinkGenerator;
 use App\Repositories\Repo;
+use App\Repositories\SourceRepo;
 use App\Traits\HTTPRequestTrait;
-use Carbon\Carbon;
 use Illuminate\{Contracts\Pagination\LengthAwarePaginator,
-    Database\Query\Builder,
     Http\JsonResponse,
     Http\Request,
     Http\Response,
+    Support\Collection,
     Support\Facades\DB};
 use \App\Classes\Response as myResponse ;
 
@@ -35,69 +35,31 @@ class HomeController extends Controller
             $sourcesName = explode(",", $request->get('source'));
             $sourcesName = array_filter($sourcesName);
 
-            $sources = DB::table('sources')
-                ->join('contracts', 'sources.id', '=', 'contracts.source_id')
-                ->whereIn('sources.name' , $sourcesName)
-                ->where('sources.enable' , 1)
-                ->where('contracts.user_id' , $customer->id)
-                ->where(function (Builder $q){
-                    $q ->where('contracts.since', '<=', Carbon::createFromFormat('Y-m-d H:i:s', Carbon::now('Asia/Tehran')))
-                        ->orWhereNull('contracts.since');
-                })->where(function (Builder $q) {
-                    $q->where('contracts.till', '>=', Carbon::createFromFormat('Y-m-d H:i:s', Carbon::now('Asia/Tehran')))
-                        ->orWhereNull('contracts.till');
-                })
-                ->select('*')
-                ->get();
+            $sources = SourceRepo::getValidSourceViaUser($sourcesName, $customer->id)->get();
         }else{
-            $sources = DB::table('contracts')
-                ->join('sources', 'sources.id', '=', 'contracts.source_id')
-                ->where('sources.enable' , 1)
-                ->where('contracts.user_id' , $customer->id)
-                ->where(function (Builder $q){
-                    $q ->where('contracts.since', '<=', Carbon::createFromFormat('Y-m-d H:i:s', Carbon::now('Asia/Tehran')))
-                        ->orWhereNull('contracts.since');
-                })->where(function (Builder $q) {
-                    $q->where('contracts.till', '>=', Carbon::createFromFormat('Y-m-d H:i:s', Carbon::now('Asia/Tehran')))
-                        ->orWhereNull('contracts.till');
-                })
-                ->select('*')
-                ->get();
+            $sources = SourceRepo::getValidSourceViaContract($customer)->get();
         }
 
         if($sources->isEmpty()){
             return response()->json($this->setErrorResponse(myResponse::NO_VALID_SOURCE_FOUND_FOR_CUSTOMER, 'NO valid source found for this customer'), Response::HTTP_NOT_FOUND);
         }
 
-        $totalAds = [];
-        foreach ($sources as $source) {
-            $ads = Repo::getRecords('ads' , ['UUID' , 'name' , 'link' , 'image'],['source_id'=>$source->id,'enable'=>1]);
-            $ads = $ads->paginate($numberOfAds, ['*'], 'page');
-            $this->generateAdLinks($adLinkGenerator, $ads);
-            $totalAds[] = [
-                'title'  =>   $source->display_name,
-                'color'  =>   'white',
-                'icon'   =>   'icon',
-                'data'   =>   $ads
-            ];
-        }
-
-
+        $totalAds = $this->makeAdsArray($adLinkGenerator, $sources, $numberOfAds);
         return response()->json($totalAds,Response::HTTP_OK , [] ,JSON_UNESCAPED_SLASHES);
     }
 
     public function fetchAd(Request $request){
         //ToDo : security : any one can update Chibekhoonam ads
-        $ad = Repo::getRecords('ads', ['*'], ['foreign_id'=>$request->ad_id])->first();
+        $ad = Repo::getRecords('ads', ['*'], ['foreign_id'=>$request->get('ad_id')])->first();
 
         if(!isset($ad)){
             return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'), Response::HTTP_NOT_FOUND);
         }
 
         $update = DB::table('ads')->update([
-           'name'   => $request->name,
-           'image'   => $request->link,
-           'link'   => $request->image,
+           'name'   => $request->get('name' , $ad->name),
+           'image'   => $request->get('link' , $ad->link),
+           'link'   => $request->get('image' , $ad->image),
         ]);
 
         if($update){
@@ -127,5 +89,28 @@ class HomeController extends Controller
             $adLinkGenerator->setAd($ad);
             $adLinkGenerator->generateLink();
         }
+    }
+
+    /**
+     * @param AdLinkGenerator $adLinkGenerator
+     * @param Collection $sources
+     * @param $numberOfAds
+     * @return array
+     */
+    private function makeAdsArray(AdLinkGenerator $adLinkGenerator, Collection $sources, $numberOfAds): array
+    {
+        $totalAds = [];
+        foreach ($sources as $source) {
+            $ads = Repo::getRecords('ads', ['UUID', 'name', 'link', 'image'], ['source_id' => $source->id, 'enable' => 1]);
+            $ads = $ads->paginate($numberOfAds, ['*'], 'page');
+            $this->generateAdLinks($adLinkGenerator, $ads);
+            $totalAds[] = [
+                'title' => $source->display_name,
+                'color' => 'white',
+                'icon' => 'icon',
+                'data' => $ads
+            ];
+        }
+        return $totalAds;
     }
 }
