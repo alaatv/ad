@@ -60,7 +60,7 @@ class HomeController extends Controller
 
         $update = DB::table('ads')->update([
            'name'   => $request->get('name' , $ad->name),
-           'image'   => $request->get('link' , $ad->link),
+           'image'  => $request->get('link' , $ad->link),
            'link'   => $request->get('image' , $ad->image),
         ]);
 
