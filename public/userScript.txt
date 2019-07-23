@@ -1,0 +1,12 @@
+<script type="text/javascript">
+	(function (d, i) {
+		var fp = 'http://a.alaatv.com/js/adEngine.js',
+			s = 'script',
+			v = new Date().getTime(),
+			f = d.getElementsByTagName(s)[0],
+			j = d.createElement(s);
+		j.async = true;
+		j.src = fp + '?id=' + i + '&v=' + v;
+		f.parentNode.insertBefore(j, f);
+	})(document, 'GTM-PNP8RDW');
+</script>

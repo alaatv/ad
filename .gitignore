@@ -3,3 +3,25 @@
 Homestead.json
 Homestead.yaml
 .env
+/node_modules
+/public/storage
+/storage/*.key
+/.vscode
+/.vagrant
+npm-debug.log
+yarn-error.log
+horizon.log
+worker.log
+# Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
+.rocketeer/
+storage
+storage/
+vendor/
+.phpunit.result.cache
+app/Services/
+mix-manifest.json
+public/mix-manifest.json
+public/phpinfo.php
+public/test.php
+public/js/adEngine.js
+public/css/adEngine.css

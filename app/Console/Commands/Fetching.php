@@ -7,6 +7,7 @@ use App\Traits\HTTPRequestTrait;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use stdClass;
 
 class Fetching extends Command
@@ -145,6 +146,7 @@ class Fetching extends Command
     private function insertAdRecord(stdClass $source, $item): void
     {
         Repo::insertRecord('ads', [
+            'UUID'  => Str::uuid()->toString() ,
             'source_id' => $source->id,
             'foreign_id' => $this->makeAdForeignId($source->id , optional($item)->id),
             'name' => optional($item)->name,

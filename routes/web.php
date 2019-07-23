@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -22,7 +24,11 @@
 //$router->get('/key', function() {
 //    return str_random(32);
 //});
+$router->get('/uuid', function() {
+        return Str::uuid();
+});
 
 //$router->get('/', [HomeController::class , 'index']);  Not working in lumen
 $router->get('/', 'HomeController@index');
 $router->post('/fetchAd', 'HomeController@fetchAds');
+$router->get('ad/{UUID}/click', 'HomeController@adClick');

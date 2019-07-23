@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Logcategory extends Model
+class Contractpage extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,9 +12,8 @@ class Logcategory extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
-        'display_name',
-        'description',
+        'conttract_id',
+        'url',
     ];
 
     protected $dates = [
@@ -23,7 +22,7 @@ class Logcategory extends Model
         'deleted_at',
     ];
 
-    public function logs(){
-        return $this->hasMany(Log::class) ;
+    public function contract(){
+        return $this->belongsTo(Contract::class) ;
     }
 }

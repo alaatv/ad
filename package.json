@@ -1,0 +1,34 @@
+{
+  "name": "adengine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "NODE_ENV=development webpack --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch": "NODE_ENV=development webpack --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "hot": "NODE_ENV=development webpack-dev-server --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "prod": "NODE_ENV=production webpack --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sohrabafard/adEngine.git"
+  },
+  "author": "Alaa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sohrabafard/adEngine/issues"
+  },
+  "homepage": "https://github.com/sohrabafard/adEngine#readme",
+  "dependencies": {
+    "laravel-mix": "^4.1.2"
+  },
+  "devDependencies": {
+    "resolve-url-loader": "3.1.0",
+    "sass": "^1.22.7",
+    "sass-loader": "7.*"
+  }
+}

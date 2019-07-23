@@ -16,7 +16,11 @@ class Log extends Model
         'text',
     ];
 
-    protected $dates = ['deleted_at'];
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     public function category(){
         return $this->belongsTo(Logcategory::class , 'category_id' , 'id') ;

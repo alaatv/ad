@@ -4,6 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property mixed UUID
+ */
 class Ad extends Model
 {
     /**
@@ -12,6 +15,7 @@ class Ad extends Model
      * @var array
      */
     protected $fillable = [
+        'UUID',
         'source_id',
         'foreign_id',
         'name',
@@ -20,9 +24,14 @@ class Ad extends Model
         'enable',
     ];
 
-    protected $dates = ['deleted_at'];
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     public function source(){
         return $this->belongsTo(Source::class) ;
     }
+
 }
