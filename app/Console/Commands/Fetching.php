@@ -7,6 +7,8 @@ use App\Traits\HTTPRequestTrait;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use stdClass;
 
@@ -103,7 +105,7 @@ class Fetching extends Command
             [$fetchDone , $items , $perPage , $nextPage , $message] = $this->fetchAd($fetchUrl, $page);
             if ($fetchDone) {
                 if (empty($items)) {
-                    $this->info("No $items fetched on request for page $page");
+                    $this->info("No $items fetched in request for page $page");
                     $this->info("\n");
                     continue;
                 }
@@ -114,7 +116,10 @@ class Fetching extends Command
                     if($this->isValidItem($item) && $this->isInsertable($this->makeAdForeignId($source->id, optional($item)->id))){
                         [$storeResult,$picPath] =  $this->storeAdPic(optional($item)->image);
                         if($storeResult){
-                            $item->image = $picPath;
+                            [$picTransfer,$picUrl] = $this->transferAdPicToCDN($picPath);
+                            if($picTransfer) {
+                                $item->image = $picUrl;
+                            }
                         }
 
                         $this->insertAdRecord($source, $item);
@@ -199,7 +204,7 @@ class Fetching extends Command
             $done = true;
             $data = (isset($result->data)) ? $result->data : [];
             $perPage  = optional($result)->per_page;
-            $nextPage = optional($result)->current_page + 1;
+            $nextPage = optional($result)->next_page;
             $message = 'Fetched successfully';
         }else{
             $done = false;
@@ -232,7 +237,7 @@ class Fetching extends Command
     private function isInsertable(string $adId):bool
     {
         $ad = Repo::getRecords('ads', ['id'] ,['foreign_id'=>$adId])->first();
-        return (isset($ad))?true:false;
+        return (isset($ad))?false:true;
     }
 
     /**
@@ -267,6 +272,22 @@ class Fetching extends Command
             return [true,$pathToSave];
         }
         return [false, null];
+    }
 
+    /**
+     * @param string $filePath
+     * @return
+     */
+    private function transferAdPicToCDN(string $filePath):array {
+        $disk = Storage::disk('adPicsSFTP');
+        $fileName = basename($filePath);
+        $url = null;
+        $done = false;
+        if ($disk->put($fileName, File::get($filePath))) {
+            //ToDo: Hard code!
+            $url = 'https://cdn.alaatv.com/upload/images/ads/'.$fileName;
+            $done = true;
+        }
+        return [$done, $url];
     }
 }

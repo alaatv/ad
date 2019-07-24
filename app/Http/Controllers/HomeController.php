@@ -51,11 +51,13 @@ class HomeController extends Controller
     }
 
     public function fetchAd(Request $request){
-        //ToDo : security : any one can update Chibekhoonam ads
+        //ToDo : security alert : any one can update Chibekhoonam ads
         $itemID = $request->get('item_id');
         $sourceName = $request->get('source');
         $source = Repo::getRecords('sources', ['*'], ['name'=>$sourceName])->first();
-        $ad = Repo::getRecords('ads', ['*'], ['foreign_id'=>'s'.$source->id.'_'.$itemID])->first();
+        //ToDo Hard Code
+        $foreignID = 's'.$source->id.'_'.$itemID;
+        $ad = Repo::getRecords('ads', ['*'], [$foreignID])->first();
 
         if(!isset($ad)){
             return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'), Response::HTTP_NOT_FOUND);
