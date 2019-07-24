@@ -113,7 +113,7 @@ class Fetching extends Command
         $failedPages = 0;
         do {
             $counter = 0;
-            [$fetchDone , $items , $perPage , $nextPage , $message] = $this->adFetcher->fetchAd($fetchUrl, $page);
+            [$fetchDone , $items , $perPage , $nextPage , $resultText] = $this->adFetcher->fetchAd($fetchUrl, $page);
             if ($fetchDone) {
                 if (empty($items)) {
                     $this->info("No $items fetched in request for page $page");
@@ -137,7 +137,7 @@ class Fetching extends Command
             } else {
                 $this->info("Failure on fetching page $page");
                 $this->info("\n");
-                $this->info("response: $message");
+                $this->info("response: $resultText");
                 $this->info("\n");
                 $failedPages++;
             }

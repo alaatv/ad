@@ -33,17 +33,17 @@ class AdFetcher
             $data = (isset($result->data)) ? $result->data : [];
             $perPage  = optional($result)->per_page;
             $nextPage = optional($result)->next_page;
-            $message = 'Fetched successfully';
+            $resultText = 'Fetched successfully';
         }else{
             $done = false;
-            $message = isset($result->error->message)?$result->error->message:'No response message received';
+            $resultText = isset($result->error->message)?$result->error->message:'No response message received';
         }
         return [
             $done ,
             (isset($data))?$data:null ,
             (isset($perPage))?$perPage:null ,
             (isset($nextPage))?$nextPage:null ,
-            $message,
+            $resultText,
         ];
     }
 
