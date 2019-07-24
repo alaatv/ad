@@ -2,20 +2,18 @@
 
 namespace App\Console\Commands;
 
+use App\Classes\AdFetcher;
+use App\Classes\AdItemInserter;
+use App\Classes\AdPicTransferrer;
 use App\Repositories\Repo;
 use App\Traits\adTrait;
-use App\Traits\HTTPRequestTrait;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use stdClass;
 
 class Fetching extends Command
 {
-    use HTTPRequestTrait;
-    use adTrait;
-
     /**
      * The name and signature of the console command.
      *
@@ -30,19 +28,31 @@ class Fetching extends Command
      */
     protected $description = 'Fetiching ads from a source';
 
+    private $adFetcher;
+    private $adItemInserter;
+    private $adPicTransferrer;
+
     /**
      * Create a new command instance.
      *
-     * @return void
+     * @param AdFetcher $adFetcher
+     * @param AdItemInserter $adItemInserter
+     * @param AdPicTransferrer $adPicTransferrer
      */
-    public function __construct()
+    public function __construct(AdFetcher $adFetcher , AdItemInserter $adItemInserter , AdPicTransferrer $adPicTransferrer)
     {
         parent::__construct();
+        $this->adFetcher = $adFetcher;
+        $this->adItemInserter=$adItemInserter;
+        $this->adPicTransferrer=$adPicTransferrer;
     }
 
     /**
      * Execute the console command.
      *
+     * @param AdFetcher $adFetcher
+     * @param AdItemInserter $adItemInserter
+     * @param AdPicTransferrer $adPicTransferrer
      * @return mixed
      */
     public function handle()
@@ -86,8 +96,11 @@ class Fetching extends Command
     }
 
     /**
-     * @param $fetchUrl
-     * @param $source
+     * @param string $fetchUrl
+     * @param stdClass $source
+     * @param AdFetcher $adFetcher
+     * @param AdItemInserter $adItemInserter
+     * @param AdPicTransferrer $adPicTransferrer
      * @return array
      */
     private function fetch(string $fetchUrl, stdClass $source): array
@@ -102,7 +115,7 @@ class Fetching extends Command
         $failedPages = 0;
         do {
             $counter = 0;
-            [$fetchDone , $items , $perPage , $nextPage , $message] = $this->fetchAd($fetchUrl, $page);
+            [$fetchDone , $items , $perPage , $nextPage , $message] = $this->adFetcher->fetchAd($fetchUrl, $page);
             if ($fetchDone) {
                 if (empty($items)) {
                     $this->info("No $items fetched in request for page $page");
@@ -113,7 +126,7 @@ class Fetching extends Command
                 $this->info('Inserting '.count($items).' items');
                 $bar = $this->output->createProgressBar(count($items));
                 foreach ($items as $key => $item) {
-                    if($this->storeItem($source, $item)){
+                    if($this->adItemInserter->storeItem($source, $item , $this->adPicTransferrer)){
                         $bar->advance();
                         $counter++;
                     }
@@ -141,44 +154,16 @@ class Fetching extends Command
 
     /**
      * @param stdClass $source
-     * @param $item
-     * @return bool
+     * @return int
      */
-    private function storeItem(stdClass $source, $item): bool
+    private function getPageToFetch(stdClass $source):int
     {
-        $done = false;
-        if ($this->isValidItem($item) && $this->isInsertable($this->makeAdForeignId($source->id, optional($item)->id))) {
-            [$storeResult, $picPath] = $this->storeAdPic(optional($item)->image);
-            if ($storeResult) {
-                [$picTransfer, $picUrl] = $this->transferAdPicToCDN($picPath);
-                if ($picTransfer) {
-                    $item->image = $picUrl;
-                }
-            }
-
-            $this->insertAdRecord($source, $item);
-            $done = true;
+        $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id ])->where('fetched' , '>' , 0)->orderByDesc('page')->first();
+        $page = $lastFetch->page;
+        if ($lastFetch->per_page == $lastFetch->fetched) {
+            $page = $lastFetch->page + 1;
         }
-
-        return $done;
-    }
-
-    /**
-     * @param stdClass $source
-     * @param $item
-     */
-    private function insertAdRecord(stdClass $source, $item): void
-    {
-        Repo::insertRecord('ads', [
-            'UUID'  => Str::uuid()->toString() ,
-            'source_id' => $source->id,
-            'foreign_id' => $this->makeAdForeignId($source->id , optional($item)->id),
-            'name' => optional($item)->name,
-            'image' => optional($item)->image,
-            'link' => optional($item)->link,
-            'enable' => 1,
-            'created_at' => Carbon::now(),
-        ]);
+        return $page;
     }
 
     /**
@@ -198,68 +183,5 @@ class Fetching extends Command
             'fetched' => $done,
             'created_at' => Carbon::now(),
         ]);
-    }
-
-    /**
-     * @param string $fetchUrl
-     * @param int $page
-     * @return array
-     */
-    private function fetchAd(string $fetchUrl, int $page): array
-    {
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'X-Requested-With' => 'XMLHttpRequest'
-        ];
-        $parameters = ['page' => $page];
-        $response = $this->sendRequest($fetchUrl, 'POST', $parameters, $headers);
-        $result = json_decode($response['result']);
-        if($response['statusCode'] == Response::HTTP_OK){
-            $done = true;
-            $data = (isset($result->data)) ? $result->data : [];
-            $perPage  = optional($result)->per_page;
-            $nextPage = optional($result)->next_page;
-            $message = 'Fetched successfully';
-        }else{
-            $done = false;
-            $message = isset($result->error->message)?$result->error->message:'No response message received';
-        }
-        return [
-            $done ,
-            (isset($data))?$data:null ,
-            (isset($perPage))?$perPage:null ,
-            (isset($nextPage))?$nextPage:null ,
-            $message,
-        ];
-    }
-
-    /**
-     * @param $item
-     * @return bool
-     */
-    private function isValidItem($item):bool
-    {
-        return isset($item->id) && isset($item->name) && isset($item->link) && isset($item->image);
-    }
-
-    private function isInsertable(string $adId):bool
-    {
-        $ad = Repo::getRecords('ads', ['id'] ,['foreign_id'=>$adId])->first();
-        return (isset($ad))?false:true;
-    }
-
-    /**
-     * @param stdClass $source
-     * @return int
-     */
-    private function getPageToFetch(stdClass $source):int
-    {
-        $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id ])->where('fetched' , '>' , 0)->orderByDesc('page')->first();
-        $page = $lastFetch->page;
-        if ($lastFetch->per_page == $lastFetch->fetched) {
-            $page = $lastFetch->page + 1;
-        }
-        return $page;
     }
 }
