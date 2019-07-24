@@ -3,18 +3,18 @@
 namespace App\Console\Commands;
 
 use App\Repositories\Repo;
+use App\Traits\adTrait;
 use App\Traits\HTTPRequestTrait;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use stdClass;
 
 class Fetching extends Command
 {
     use HTTPRequestTrait;
+    use adTrait;
 
     /**
      * The name and signature of the console command.
@@ -228,12 +228,6 @@ class Fetching extends Command
         return isset($item->id) && isset($item->name) && isset($item->link) && isset($item->image);
     }
 
-    private function makeAdForeignId(int $sourceId, int $itemId):string
-    {
-        return 's'.$sourceId.'_'.$itemId;
-    }
-
-
     private function isInsertable(string $adId):bool
     {
         $ad = Repo::getRecords('ads', ['id'] ,['foreign_id'=>$adId])->first();
@@ -252,44 +246,5 @@ class Fetching extends Command
             $page = $lastFetch->page + 1;
         }
         return $page;
-    }
-
-    /**
-     * @param string $picUrl
-     * @return array
-     */
-    private function storeAdPic(string $picUrl=null): array
-    {
-        if(!isset($picUrl))
-            return [false, null];
-
-        $basePath = explode('app/', __DIR__)[0];
-        $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename($picUrl);
-        $filePath = fopen($pathToSave, 'w');
-
-        $response = $this->sendRequest($picUrl, 'GET', [], [] , $filePath);
-        if($response['statusCode'] == Response::HTTP_OK){
-            return [true,$pathToSave];
-        }
-        return [false, null];
-    }
-
-    /**
-     * @param string $filePath
-     * @return
-     */
-    private function transferAdPicToCDN(string $filePath):array {
-        $disk = Storage::disk('adPicsSFTP');
-        $fileName = basename($filePath);
-        $url = null;
-        $done = false;
-        if ($disk->put($fileName, File::get($filePath))) {
-            $url = config('download_server.SERVER_PROTOCOL').
-                   config('download_server.SERVER_NAME').
-                   config('download_server.IMAGES_PARTIAL_PATH').
-                   '/ads/'.$fileName;
-            $done = true;
-        }
-        return [$done, $url];
     }
 }

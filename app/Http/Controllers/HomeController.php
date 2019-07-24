@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Classes\AdLinkGenerator;
 use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
+use App\Traits\adTrait;
 use App\Traits\HTTPRequestTrait;
 use Illuminate\{Contracts\Pagination\LengthAwarePaginator,
     Http\JsonResponse,
@@ -17,6 +18,7 @@ use \App\Classes\Response as myResponse ;
 class HomeController extends Controller
 {
     use HTTPRequestTrait;
+    use adTrait;
 
     public function debug(Request $request){
         //
@@ -55,9 +57,7 @@ class HomeController extends Controller
         $itemID = $request->get('item_id');
         $sourceName = $request->get('source');
         $source = Repo::getRecords('sources', ['*'], ['name'=>$sourceName])->first();
-        //ToDo Hard Code
-        $foreignID = 's'.$source->id.'_'.$itemID;
-        $ad = Repo::getRecords('ads', ['*'], [$foreignID])->first();
+        $ad = Repo::getRecords('ads', ['*'], [$this->makeAdForeignId($source->id , $itemID)])->first();
 
         if(!isset($ad)){
             return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'), Response::HTTP_NOT_FOUND);
