@@ -285,7 +285,10 @@ class Fetching extends Command
         $done = false;
         if ($disk->put($fileName, File::get($filePath))) {
             //ToDo: Hard code!
-            $url = 'https://cdn.alaatv.com/upload/images/ads/'.$fileName;
+            $url = config('download_server.SERVER_PROTOCOL').
+                   config('download_server.SERVER_NAME').
+                   config('download_server.IMAGES_PARTIAL_PATH').
+                   '/ads/'.$fileName;
             $done = true;
         }
         return [$done, $url];
