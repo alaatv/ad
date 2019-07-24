@@ -66,16 +66,12 @@ class Fetching extends Command
 
                 [$donePages, $failedPages] = $this->fetch($fetchUrl, $source);
 
-                $this->info('total fetched pages: '.$donePages);
-                $this->info("\n");
-                $this->info('total failed pages: '.$failedPages);
+                $this->printInfo(['total fetched pages: '.$donePages,'total failed pages: '.$failedPages]);
             }else{
-                $this->info('Fetch Url not found');
-                $this->info("\n");
+                $this->printInfo(['Fetch Url not found']);
             }
         }else{
-            $this->info('Source not found');
-            $this->info("\n");
+            $this->printInfo(['Source not found']);
         }
     }
 
@@ -108,7 +104,7 @@ class Fetching extends Command
         }else{
             $page = $this->adFetcher->getPageToFetch($source);
         }
-        $this->info('Start fetching from page '.$page);
+        $this->printInfo(['Start fetching from page '.$page]);
 
         $failedPages = 0;
         do {
@@ -116,12 +112,11 @@ class Fetching extends Command
             [$fetchDone , $items , $perPage , $nextPage , $resultText] = $this->adFetcher->fetchAd($fetchUrl, $page);
             if ($fetchDone) {
                 if (empty($items)) {
-                    $this->info("No $items fetched in request for page $page");
-                    $this->info("\n");
+                    $this->printInfo(["No $items fetched in request for page $page"]);
                     continue;
                 }
 
-                $this->info('Inserting '.count($items).' items');
+                $this->printInfo(['Inserting '.count($items).' items']);
                 $bar = $this->output->createProgressBar(count($items));
                 foreach ($items as $key => $item) {
                     if($this->adItemInserter->storeItem($source, $item , $this->adPicTransferrer)){
@@ -135,10 +130,7 @@ class Fetching extends Command
 
                 $firstItemId = optional($items[0])->id;
             } else {
-                $this->info("Failure on fetching page $page");
-                $this->info("\n");
-                $this->info("response: $resultText");
-                $this->info("\n");
+                $this->printInfo(["Failure on fetching page $page","response: $resultText"]);
                 $failedPages++;
             }
 
@@ -167,5 +159,16 @@ class Fetching extends Command
             'fetched' => $done,
             'created_at' => Carbon::now(),
         ]);
+    }
+
+    /**
+     * @param array $texts
+     */
+    private function printInfo(array $texts):void
+    {
+        foreach ($texts as $text) {
+            $this->info($text);
+            $this->info("\n");
+        }
     }
 }
