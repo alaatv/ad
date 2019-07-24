@@ -56,7 +56,7 @@ class Fetching extends Command
             if(isset($fetchUrl)){
                 $this->insertFetchingLog($source);
 
-                [$donePages, $failedPages] = $this->doFetching($fetchUrl, $source);
+                [$donePages, $failedPages] = $this->fetch($fetchUrl, $source);
 
                 $this->info('total fetched pages: '.$donePages);
                 $this->info("\n");
@@ -90,7 +90,7 @@ class Fetching extends Command
      * @param $source
      * @return array
      */
-    private function doFetching(string $fetchUrl,stdClass $source): array
+    private function fetch(string $fetchUrl, stdClass $source): array
     {
         if ($this->confirm('Do you want to fetch all of items?', true)) {
             $page = 1;
@@ -113,16 +113,7 @@ class Fetching extends Command
                 $this->info('Inserting '.count($items).' items');
                 $bar = $this->output->createProgressBar(count($items));
                 foreach ($items as $key => $item) {
-                    if($this->isValidItem($item) && $this->isInsertable($this->makeAdForeignId($source->id, optional($item)->id))){
-                        [$storeResult,$picPath] =  $this->storeAdPic(optional($item)->image);
-                        if($storeResult){
-                            [$picTransfer,$picUrl] = $this->transferAdPicToCDN($picPath);
-                            if($picTransfer) {
-                                $item->image = $picUrl;
-                            }
-                        }
-
-                        $this->insertAdRecord($source, $item);
+                    if($this->storeItem($source, $item)){
                         $bar->advance();
                         $counter++;
                     }
@@ -146,6 +137,30 @@ class Fetching extends Command
         } while (isset($page));
 
         return [$page, $failedPages];
+    }
+
+    /**
+     * @param stdClass $source
+     * @param $item
+     * @return bool
+     */
+    private function storeItem(stdClass $source, $item): bool
+    {
+        $done = false;
+        if ($this->isValidItem($item) && $this->isInsertable($this->makeAdForeignId($source->id, optional($item)->id))) {
+            [$storeResult, $picPath] = $this->storeAdPic(optional($item)->image);
+            if ($storeResult) {
+                [$picTransfer, $picUrl] = $this->transferAdPicToCDN($picPath);
+                if ($picTransfer) {
+                    $item->image = $picUrl;
+                }
+            }
+
+            $this->insertAdRecord($source, $item);
+            $done = true;
+        }
+
+        return $done;
     }
 
     /**
