@@ -37,6 +37,7 @@ class AdCollector
     private function generateAdLinks(LengthAwarePaginator $ads): void
     {
         foreach ($ads as $ad) {
+            // ToDo: Refactor
             $adLinkGenerator = new AdLinkGenerator($ad);
             $adLinkGenerator->generateLink();
         }
