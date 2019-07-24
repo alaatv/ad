@@ -86,17 +86,6 @@ class HomeController extends Controller
         return redirect($ad->link);
     }
 
-    /**
-     * @param AdLinkGenerator $adLinkGenerator
-     * @param LengthAwarePaginator $ads
-     */
-    private function generateAdLinks(AdLinkGenerator $adLinkGenerator, LengthAwarePaginator $ads): void
-    {
-        foreach ($ads as $ad) {
-            $adLinkGenerator->setAd($ad);
-            $adLinkGenerator->generateLink();
-        }
-    }
 
     /**
      * @param AdLinkGenerator $adLinkGenerator
@@ -119,5 +108,17 @@ class HomeController extends Controller
             ];
         }
         return $totalAds;
+    }
+
+    /**
+     * @param AdLinkGenerator $adLinkGenerator
+     * @param LengthAwarePaginator $ads
+     */
+    private function generateAdLinks(AdLinkGenerator $adLinkGenerator, LengthAwarePaginator $ads): void
+    {
+        foreach ($ads as $ad) {
+            $adLinkGenerator->setAd($ad);
+            $adLinkGenerator->generateLink();
+        }
     }
 }
