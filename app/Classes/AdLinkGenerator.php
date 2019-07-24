@@ -22,14 +22,4 @@ class AdLinkGenerator
     public function generateLink(){
         $this->ad->link = env('APP_URL').'/ad/'.$this->ad->UUID.'/click';
     }
-
-    /**
-     * @param stdClass $ad
-     * @return AdLinkGenerator
-     */
-    public function setAd(stdClass $ad): AdLinkGenerator
-    {
-        $this->ad = $ad;
-        return $this;
-    }
 }

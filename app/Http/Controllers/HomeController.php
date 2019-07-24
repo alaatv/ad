@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\AdLinkGenerator;
+use App\Classes\AdCollector;
 use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
 use App\Traits\adTrait;
 use App\Traits\HTTPRequestTrait;
-use Illuminate\{Contracts\Pagination\LengthAwarePaginator,
+use Illuminate\{
     Http\JsonResponse,
     Http\Request,
     Http\Response,
-    Support\Collection,
     Support\Facades\DB};
 use \App\Classes\Response as myResponse ;
 
@@ -26,10 +25,10 @@ class HomeController extends Controller
 
     /**
      * @param Request $request
-     * @param AdLinkGenerator $adLinkGenerator
+     * @param AdCollector $adResponseGenerator
      * @return JsonResponse
      */
-    public function index(Request $request , AdLinkGenerator $adLinkGenerator){
+    public function index(Request $request , AdCollector $adResponseGenerator){
         $numberOfAds = $request->get('numberOfAds' , 6);
         $customerUUID = $request->get('UUID');
         $sourceNames = $request->get('source' , []);
@@ -48,7 +47,7 @@ class HomeController extends Controller
             return response()->json($this->setErrorResponse(myResponse::NO_VALID_SOURCE_FOUND_FOR_CUSTOMER, 'NO valid source found for this customer'), Response::HTTP_NOT_FOUND);
         }
 
-        $totalAds = $this->makeAdsArray($adLinkGenerator, $sources, $numberOfAds);
+        $totalAds = $adResponseGenerator->makeAdsArray($sources, $numberOfAds);
         return response()->json($totalAds,Response::HTTP_OK , [] ,JSON_UNESCAPED_SLASHES);
     }
 
@@ -86,39 +85,4 @@ class HomeController extends Controller
         return redirect($ad->link);
     }
 
-
-    /**
-     * @param AdLinkGenerator $adLinkGenerator
-     * @param Collection $sources
-     * @param $numberOfAds
-     * @return array
-     */
-    private function makeAdsArray(AdLinkGenerator $adLinkGenerator, Collection $sources, $numberOfAds): array
-    {
-        $totalAds = [];
-        foreach ($sources as $source) {
-            $ads = Repo::getRecords('ads', ['UUID', 'name', 'link', 'image'], ['source_id' => $source->id, 'enable' => 1]);
-            $ads = $ads->paginate($numberOfAds, ['*'], 'page');
-            $this->generateAdLinks($adLinkGenerator, $ads);
-            $totalAds[] = [
-                'title' => $source->display_name,
-                'color' => 'white',
-                'icon' => 'icon',
-                'data' => $ads
-            ];
-        }
-        return $totalAds;
-    }
-
-    /**
-     * @param AdLinkGenerator $adLinkGenerator
-     * @param LengthAwarePaginator $ads
-     */
-    private function generateAdLinks(AdLinkGenerator $adLinkGenerator, LengthAwarePaginator $ads): void
-    {
-        foreach ($ads as $ad) {
-            $adLinkGenerator->setAd($ad);
-            $adLinkGenerator->generateLink();
-        }
-    }
 }
