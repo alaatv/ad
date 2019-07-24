@@ -29,9 +29,10 @@ class HomeController extends Controller
      * @return JsonResponse
      */
     public function index(Request $request , AdCollector $adResponseGenerator){
-        $numberOfAds = $request->get('numberOfAds' , 6);
-        $customerUUID = $request->get('UUID');
-        $sourceNames = $request->get('source' , []);
+        $numberOfAds    = $request->get('numberOfAds' , 6);
+        $customerUUID   = $request->get('UUID');
+        $sourceNames    = $request->get('source' , []);
+        $urls           = $request->get('urls' , []);
         $customer = Repo::getRecords('users', ['*'], ['UUID'=>$customerUUID])->first();
         if(!isset($customer)){
             return response()->json($this->setErrorResponse(myResponse::USER_NOT_FOUND, 'User not found'), Response::HTTP_NOT_FOUND);
@@ -41,7 +42,7 @@ class HomeController extends Controller
             $sourceNames = convertTagStringToArray($sourceNames);
         }
 
-        $sources = SourceRepo::getValidSource($customer->id,$sourceNames)->get();
+        $sources = SourceRepo::getValidSource($customer->id,$sourceNames,$urls)->get();
 
         if($sources->isEmpty()){
             return response()->json($this->setErrorResponse(myResponse::NO_VALID_SOURCE_FOUND_FOR_CUSTOMER, 'NO valid source found for this customer'), Response::HTTP_NOT_FOUND);

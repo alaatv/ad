@@ -16,12 +16,12 @@ class CreateContractpagesTable extends Migration
     {
         Schema::create('contractpages', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('conttract_id')->comment('آی دی قرارداد');
+            $table->unsignedInteger('contract_id')->comment('آی دی قرارداد');
             $table->string('url')->nullable()->comment('آدرس صفحه تبلیغ مشمول قرارداد');
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('conttract_id')
+            $table->foreign('contract_id')
                 ->references('id')
                 ->on('contracts')
                 ->onDelete('cascade')

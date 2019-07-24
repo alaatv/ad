@@ -13,9 +13,10 @@ class SourceRepo
     /**
      * @param int $customerId
      * @param array $sourceNames
+     * @param array $urls
      * @return Builder
      */
-    public static function getValidSource(int $customerId , array $sourceNames=[]): Builder{
+    public static function getValidSource(int $customerId , array $sourceNames=[] , array $urls=[]): Builder{
         $sources= DB::table('sources')
             ->join('contracts', 'sources.id', '=', 'contracts.source_id')
             ->where('sources.enable' , 1)
@@ -30,6 +31,14 @@ class SourceRepo
 
         if(!empty($sourceNames)){
             $sources->whereIn('sources.name' , $sourceNames);
+        }
+
+        if(!empty($urls)){
+            $sources->whereExists(function (){
+                DB::table('contractpages')
+                    ->join('contracts', 'contracts.id', '=', 'contractpages.contract_id')
+                    ->select(['*']);
+            });
         }
 
         return $sources->select('*');
