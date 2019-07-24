@@ -284,7 +284,6 @@ class Fetching extends Command
         $url = null;
         $done = false;
         if ($disk->put($fileName, File::get($filePath))) {
-            //ToDo: Hard code!
             $url = config('download_server.SERVER_PROTOCOL').
                    config('download_server.SERVER_NAME').
                    config('download_server.IMAGES_PARTIAL_PATH').
