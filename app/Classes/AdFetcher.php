@@ -4,8 +4,10 @@
 namespace App\Classes;
 
 
+use App\Repositories\Repo;
 use App\Traits\HTTPRequestTrait;
 use Illuminate\Http\Response;
+use stdClass;
 
 class AdFetcher
 {
@@ -44,4 +46,20 @@ class AdFetcher
             $message,
         ];
     }
+
+    /**
+     * @param stdClass $source
+     * @return int
+     */
+    public function getPageToFetch(stdClass $source):int
+    {
+        $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id ])->where('fetched' , '>' , 0)->orderByDesc('page')->first();
+        $page = $lastFetch->page;
+        if ($lastFetch->per_page == $lastFetch->fetched) {
+            $page = $lastFetch->page + 1;
+        }
+        return $page;
+    }
+
+
 }

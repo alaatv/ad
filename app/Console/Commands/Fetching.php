@@ -6,10 +6,8 @@ use App\Classes\AdFetcher;
 use App\Classes\AdItemInserter;
 use App\Classes\AdPicTransferrer;
 use App\Repositories\Repo;
-use App\Traits\adTrait;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 use stdClass;
 
 class Fetching extends Command
@@ -108,7 +106,7 @@ class Fetching extends Command
         if ($this->confirm('Do you want to fetch all of items?', true)) {
             $page = 1;
         }else{
-            $page = $this->getPageToFetch($source);
+            $page = $this->adFetcher->getPageToFetch($source);
         }
         $this->info('Start fetching from page '.$page);
 
@@ -150,20 +148,6 @@ class Fetching extends Command
         } while (isset($page));
 
         return [$page, $failedPages];
-    }
-
-    /**
-     * @param stdClass $source
-     * @return int
-     */
-    private function getPageToFetch(stdClass $source):int
-    {
-        $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id ])->where('fetched' , '>' , 0)->orderByDesc('page')->first();
-        $page = $lastFetch->page;
-        if ($lastFetch->per_page == $lastFetch->fetched) {
-            $page = $lastFetch->page + 1;
-        }
-        return $page;
     }
 
     /**
