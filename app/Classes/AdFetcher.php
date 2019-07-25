@@ -14,6 +14,11 @@ class AdFetcher
     use HTTPRequestTrait;
 
     const FIRST_FETCH_DATE = '2016-03-01';
+    const FETCHING_REQUEST_HEADERS = [
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+        'X-Requested-With' => 'XMLHttpRequest'
+    ];
 
     /**
      * @param string $fetchUrl
@@ -21,12 +26,7 @@ class AdFetcher
      */
     public function fetchAd(string $fetchUrl): array
     {
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'X-Requested-With' => 'XMLHttpRequest'
-        ];
-        $response = $this->sendRequest($fetchUrl, 'POST', [], $headers);
+        $response = $this->sendRequest($fetchUrl, 'POST', [], self::FETCHING_REQUEST_HEADERS);
         $result = json_decode($response['result']);
         if($response['statusCode'] == Response::HTTP_OK){
             $done = true;
