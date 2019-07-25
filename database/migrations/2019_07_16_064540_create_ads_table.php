@@ -19,6 +19,7 @@ class CreateAdsTable extends Migration
             $table->string('UUID')->unique()->comment('کد تبلیغ');
             $table->unsignedInteger('source_id')->nullable()->comment('منبع تبلیغ');
             $table->string('foreign_id')->nullable()->comment('آی دی خارجی تبلیغ');
+            $table->string('type')->nullable()->comment('مشخص کننده نوع تبلیغ از سمت منبع');
             $table->string('name')->nullable()->comment('نام تبلیغ');
             $table->string('image')->nullable()->comment('مسیر عکس تبلیغ');
             $table->string('link')->nullable()->comment('لینک تبلیغ');

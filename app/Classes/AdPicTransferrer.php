@@ -44,10 +44,9 @@ class AdPicTransferrer
         $url = null;
         $done = false;
         if ($disk->put($fileName, File::get($filePath))) {
-            $url = config('download_server.SERVER_PROTOCOL').
-                config('download_server.SERVER_NAME').
-                config('download_server.IMAGES_PARTIAL_PATH').
-                '/ads/'.$fileName;
+            $url = 'upload/images/'.
+//                .config('download_server.IMAGES_PARTIAL_PATH').
+                    'ads/'.$fileName;
             $done = true;
         }
         return [$done, $url];

@@ -23,7 +23,7 @@ class AdItemInserter
     public function storeItem(stdClass $source, $item , AdPicTransferrer $adPicTransferrer): bool
     {
         $done = false;
-        if ($this->isValidItem($item) && $this->isInsertable($this->makeAdForeignId($source->id, optional($item)->id))) {
+        if ($this->isValidItem($item) && $this->isInsertable($this->makeAdForeignId($source->id, optional($item)->id , optional($item)->type))) {
             [$storeResult, $picPath] = $adPicTransferrer->storeAdPic(optional($item)->image);
             if ($storeResult) {
                 [$picTransfer, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
@@ -48,7 +48,8 @@ class AdItemInserter
         Repo::insertRecord('ads', [
             'UUID'  => Str::uuid()->toString() ,
             'source_id' => $source->id,
-            'foreign_id' => $this->makeAdForeignId($source->id , optional($item)->id),
+            'foreign_id' => $this->makeAdForeignId($source->id , optional($item)->id , optional($item)->type),
+            'type' => optional($item)->type,
             'name' => optional($item)->name,
             'image' => optional($item)->image,
             'link' => optional($item)->link,

@@ -31,8 +31,14 @@ class Repo
         return $records;
     }
 
-    public static function insertRecord(string $table, array $data ){
+    public static function insertRecord(string $table, array $data ):bool
+    {
         return DB::table($table)->insert($data);
+    }
+
+    public static function updateRecord(string $table, array $data):bool
+    {
+        return DB::table($table)->update($data);
     }
 
     public static function valid(Builder $query):Builder{
@@ -50,13 +56,13 @@ class Repo
         return $query->where('enable' , 1);
     }
 
-    private static function filter(Builder $records , array $filters){
+    private static function filter(Builder $records , array $filters):void {
         foreach ($filters as $key => $filter) {
             $records->where($key , $filter);
         }
     }
 
-    private static function filterMultipleValue(Builder $records , array $filters){
+    private static function filterMultipleValue(Builder $records , array $filters):void {
         foreach ($filters as $key => $filter) {
             $records->whereIn($key , $filter);
         }

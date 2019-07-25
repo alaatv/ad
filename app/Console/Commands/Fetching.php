@@ -48,28 +48,16 @@ class Fetching extends Command
     /**
      * Execute the console command.
      *
-     * @param AdFetcher $adFetcher
-     * @param AdItemInserter $adItemInserter
-     * @param AdPicTransferrer $adPicTransferrer
-     * @return mixed
      */
-    public function handle()
+    public function handle():void
     {
         $sourceName = $this->argument('source');
 
         /** @var stdClass $source */
         $source = Repo::getRecords('sources' , ['*'], ['name'=>$sourceName])->first();
         if(isset($source)){
-            $fetchUrl = $source->fetch_url;
-            if(isset($fetchUrl)){
-                $this->insertFetchingLog($source);
-
-                [$donePages, $failedPages] = $this->fetch($fetchUrl, $source);
-
-                $this->printInfo(['total fetched pages: '.$donePages,'total failed pages: '.$failedPages]);
-            }else{
-                $this->printInfo(['Fetch Url not found']);
-            }
+            [$donePages, $failedPages] = $this->fetch($source);
+            $this->printInfo(['total fetched pages: '.$donePages,'total failed pages: '.$failedPages]);
         }else{
             $this->printInfo(['Source not found']);
         }
@@ -77,42 +65,27 @@ class Fetching extends Command
 
     /**
      * @param stdClass $source
-     */
-    private function insertFetchingLog(stdClass $source): void
-    {
-        $fetchStartCat = Repo::getRecords('logcategories', ['*'], ['name' => 'fetching'])->first();
-        Repo::insertRecord('logs', [
-            'source_id' => optional($source)->id,
-            'category_id' => optional($fetchStartCat)->id,
-            'text' => 'Fetching started',
-            'created_at' => Carbon::now(),
-        ]);
-    }
-
-    /**
-     * @param string $fetchUrl
-     * @param stdClass $source
-     * @param AdFetcher $adFetcher
-     * @param AdItemInserter $adItemInserter
-     * @param AdPicTransferrer $adPicTransferrer
      * @return array
      */
-    private function fetch(string $fetchUrl, stdClass $source): array
+    private function fetch(stdClass $source): array
     {
-        if ($this->confirm('Do you want to fetch all of items?', true)) {
-            $page = 1;
-        }else{
-            $page = $this->adFetcher->getPageToFetch($source);
+        $fetchUrl = $this->adFetcher->getFetchUrl($source);
+        if(is_null($fetchUrl)) {
+            $this->printInfo(['Fetch Url not found']);
+            return [0, 0];
         }
-        $this->printInfo(['Start fetching from page '.$page]);
 
+        $this->printInfo(['Start fetching...']);
         $failedPages = 0;
+        $donePages = 0;
+
         do {
             $counter = 0;
-            [$fetchDone , $items , $perPage , $nextPage , $resultText] = $this->adFetcher->fetchAd($fetchUrl, $page);
+            $this->printInfo(["Fetching $fetchUrl"]);
+            [$fetchDone , $items , $currentPage , $nextPageUrl , $lastPage, $resultText] = $this->adFetcher->fetchAd($fetchUrl);
             if ($fetchDone) {
                 if (empty($items)) {
-                    $this->printInfo(["No $items fetched in request for page $page"]);
+                    $this->printInfo(["No items fetched in request for page $currentPage"]);
                     continue;
                 }
 
@@ -128,37 +101,16 @@ class Fetching extends Command
                 $bar->setProgress($counter);
                 $this->info("\n");
 
-                $firstItemId = optional($items[0])->id;
+                $this->insertOrUpdateFetch($source, $currentPage, $lastPage, $nextPageUrl);
+                $fetchUrl = $nextPageUrl;
+                $donePages++;
             } else {
-                $this->printInfo(["Failure on fetching page $page","response: $resultText"]);
+                $this->printInfo(["Failed on fetching $fetchUrl","response: $resultText"]);
                 $failedPages++;
             }
+        } while ($currentPage < $lastPage );
 
-            $this->insertFetchLog($source, (isset($firstItemId)) ? $firstItemId : null, $page, $perPage, $counter);
-
-            $page = $nextPage;
-        } while (isset($page));
-
-        return [$page, $failedPages];
-    }
-
-    /**
-     * @param stdClass $source
-     * @param $firstItem
-     * @param int $page
-     * @param int $perPage
-     * @param int $done
-     */
-    private function insertFetchLog(stdClass $source, $firstItem, int $page, int $perPage, int $done): void
-    {
-        Repo::insertRecord('fetches', [
-            'source_id' => $source->id,
-            'first_item_id' => $firstItem,
-            'page' => $page,
-            'per_page' => $perPage,
-            'fetched' => $done,
-            'created_at' => Carbon::now(),
-        ]);
+        return [$donePages, $failedPages];
     }
 
     /**
@@ -170,5 +122,56 @@ class Fetching extends Command
             $this->info($text);
             $this->info("\n");
         }
+    }
+
+    /**
+     * @param stdClass $source
+     * @param $currentPage
+     * @param $lastPage
+     * @param $nextPageUrl
+     * @return bool
+     */
+    private function insertOrUpdateFetch(stdClass $source, $currentPage, $lastPage, $nextPageUrl): bool
+    {
+        if ($currentPage == 1) {
+            return $this->insertFetch($source->id, $currentPage, $lastPage, $nextPageUrl);
+        } else {
+            return $this->updateFetch($source->id, $currentPage, $nextPageUrl);
+        }
+    }
+
+    /**
+     * @param int $sourceID
+     * @param int $currentPage
+     * @param int $lastPage
+     * @param string $nextPageUrl
+     * @return bool
+     */
+    private function insertFetch(int $sourceID, int $currentPage, int $lastPage=null, string $nextPageUrl=null):bool
+    {
+        return Repo::insertRecord('fetches', [
+            'source_id' => $sourceID,
+            'current_page' => $currentPage,
+            'last_page' => $lastPage,
+            'next_page_url' => $nextPageUrl,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+    }
+
+    /**
+     * @param int $sourceID
+     * @param $currentPage
+     * @param $nextPageUrl
+     * @return bool
+     */
+    private function updateFetch(int $sourceID, $currentPage, $nextPageUrl):bool
+    {
+        return Repo::updateRecord('fetches', [
+            'source_id' => $sourceID,
+            'current_page' => $currentPage,
+            'next_page_url' => $nextPageUrl,
+            'updated_at' => Carbon::now(),
+        ]);
     }
 }

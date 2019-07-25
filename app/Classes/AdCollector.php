@@ -21,6 +21,7 @@ class AdCollector
             $ads = Repo::getRecords('ads', ['UUID', 'name', 'link', 'image'], ['source_id' => $source->id, 'enable' => 1]);
             $ads = $ads->paginate($numberOfAds, ['*'], 'page');
             $this->generateAdLinks($ads);
+            $this->generateAdPicLinks($ads);
             $totalAds[] = $this->adBlockFormatter($source, $ads);
         }
         return $totalAds;
@@ -38,6 +39,15 @@ class AdCollector
         }
     }
 
+    private function generateAdPicLinks(LengthAwarePaginator $ads)
+    {
+        foreach ($ads as $ad) {
+            // ToDo : Refactor
+            $adLinkGenerator = new AdPicLinkGenerator($ad);
+            $adLinkGenerator->generatePicLink();
+        }
+    }
+
     /**
      * @param $source
      * @param LengthAwarePaginator $ads
@@ -52,4 +62,5 @@ class AdCollector
             'data' => $ads
         ];
     }
+
 }

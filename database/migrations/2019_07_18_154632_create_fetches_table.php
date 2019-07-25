@@ -17,10 +17,9 @@ class CreateFetchesTable extends Migration
         Schema::create('fetches', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('source_id')->nullable()->comment('آی دی منبع فچ');
-            $table->integer('first_item_id')->nullable()->comment('آی دی اولین آیتم فچ شده');
-            $table->integer('page')->nullable()->comment('شماره صفحه ای که فچ شده');
-            $table->integer('per_page')->nullable()->comment('تعداد آیتم های فچ شده در هر صفحه');
-            $table->integer('fetched')->nullable()->comment('تعداد فچ شده');
+            $table->integer('current_page')->nullable()->comment('شماره صفحه ای که فچ شده');
+            $table->integer('last_page')->nullable()->comment('شماره آخرین صفحه');
+            $table->string('next_page_url')->nullable()->comment('آدرس صفحه بعدی');
             $table->timestamps();
             $table->softDeletes();
 

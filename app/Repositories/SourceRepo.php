@@ -33,13 +33,13 @@ class SourceRepo
             $sources->whereIn('sources.name' , $sourceNames);
         }
 
-        if(!empty($urls)){
-            $sources->whereExists(function (){
-                DB::table('contractpages')
-                    ->join('contracts', 'contracts.id', '=', 'contractpages.contract_id')
-                    ->select(['*']);
-            });
-        }
+//        if(!empty($urls)){
+//            $sources->whereExists(function (){
+//                DB::table('contractpages')
+//                    ->join('contracts', 'contracts.id', '=', 'contractpages.contract_id')
+//                    ->select(['*']);
+//            });
+//        }
 
         return $sources->select('*');
     }

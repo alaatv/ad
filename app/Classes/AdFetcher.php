@@ -15,24 +15,23 @@ class AdFetcher
 
     /**
      * @param string $fetchUrl
-     * @param int $page
      * @return array
      */
-    public function fetchAd(string $fetchUrl, int $page): array
+    public function fetchAd(string $fetchUrl): array
     {
         $headers = [
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'X-Requested-With' => 'XMLHttpRequest'
         ];
-        $parameters = ['page' => $page];
-        $response = $this->sendRequest($fetchUrl, 'POST', $parameters, $headers);
+        $response = $this->sendRequest($fetchUrl, 'POST', [], $headers);
         $result = json_decode($response['result']);
         if($response['statusCode'] == Response::HTTP_OK){
             $done = true;
             $data = (isset($result->data)) ? $result->data : [];
-            $perPage  = optional($result)->per_page;
-            $nextPage = optional($result)->next_page;
+            $currentPage  = optional($result)->current_page;
+            $nextPageUrl = optional($result)->next_page_url;
+            $lastPage = optional($result)->last_page;
             $resultText = 'Fetched successfully';
         }else{
             $done = false;
@@ -41,25 +40,29 @@ class AdFetcher
         return [
             $done ,
             (isset($data))?$data:null ,
-            (isset($perPage))?$perPage:null ,
-            (isset($nextPage))?$nextPage:null ,
+            (isset($currentPage))?$currentPage:null ,
+            (isset($nextPageUrl))?$nextPageUrl:null ,
+            (isset($lastPage))?$lastPage:null ,
             $resultText,
         ];
     }
 
     /**
      * @param stdClass $source
-     * @return int
+     * @return string
      */
-    public function getPageToFetch(stdClass $source):int
+    public function getFetchUrl(stdClass $source):string
     {
-        $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id ])->where('fetched' , '>' , 0)->orderByDesc('page')->first();
-        $page = $lastFetch->page;
-        if ($lastFetch->per_page == $lastFetch->fetched) {
-            $page = $lastFetch->page + 1;
+        $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id])->orderByDesc('created_at')->first();
+        if (is_null($lastFetch)) {
+            $fetchUrl = $source->fetch_url.'?timestamp=2016-03-01';
+        } else {
+            if ($lastFetch->current_page < $lastFetch->last_page) {
+                $fetchUrl = $lastFetch->next_page_url;
+            } else {
+                $fetchUrl = $source->fetch_url . '?timestamp=' . $lastFetch->updated_at;
+            }
         }
-        return $page;
+        return $fetchUrl;
     }
-
-
 }

@@ -58,6 +58,23 @@ return [
             'dHost'      => env('DOWNLOAD_SERVER_NAME',''),
             'dProtocol'  => env('DOWNLOAD_SERVER_PROTOCOL',''),
         ],
+
+        'alaaCdnSFTP'     => [
+            'driver'     => 'sftp',
+            'host'       => env('SFTP_HOST', ''),
+            'port'       => env('SFTP_PORT', '22'),
+            'username'   => env('SFTP_USERNAME', ''),
+            'password'   => env('SFTP_PASSSWORD', ''),
+            'privateKey' => env('SFTP_PRIVATE_KEY_PATH', ''),
+            'root'       => "/alaa_media/cdn/",
+            'timeout'    => env('SFTP_TIMEOUT', '10'),
+            'prefix'     => null,
+            'dHost'      => "cdn.alaatv.com",
+            'dProtocol'  => "https://",
+        ],
+
+
+
         's3' => [
             'driver' => 's3',
             'key'    => env('AWS_ACCESS_KEY_ID'),

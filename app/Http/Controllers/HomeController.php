@@ -55,9 +55,10 @@ class HomeController extends Controller
     public function fetchAd(Request $request){
         //ToDo : security alert : any one can update Chibekhoonam ads
         $itemID = $request->get('item_id');
+        $itemType = $request->get('item_type');
         $sourceName = $request->get('source');
         $source = Repo::getRecords('sources', ['*'], ['name'=>$sourceName])->first();
-        $ad = Repo::getRecords('ads', ['*'], [$this->makeAdForeignId($source->id , $itemID)])->first();
+        $ad = Repo::getRecords('ads', ['*'], [$this->makeAdForeignId($source->id , $itemID , $itemType)])->first();
 
         if(!isset($ad)){
             return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'), Response::HTTP_NOT_FOUND);
@@ -83,7 +84,9 @@ class HomeController extends Controller
         if(!isset($ad)){
             return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'), Response::HTTP_NOT_FOUND);
         }
-        return redirect($ad->link);
+
+        $redirectUrl = $request->get('redirect' , $ad->link);
+        return view('adForm' , compact($redirectUrl));
     }
 
 }
