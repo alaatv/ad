@@ -86,7 +86,9 @@ class HomeController extends Controller
         }
 
         $redirectUrl = $request->get('redirect' , $ad->link);
-        return view('adForm' , compact($redirectUrl));
+        return redirect($redirectUrl);
+        //ToDo pass redirectUrl to an HTML form
+//        return view('adForm' , compact($redirectUrl));
     }
 
 }
