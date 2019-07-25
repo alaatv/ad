@@ -13,6 +13,8 @@ class AdFetcher
 {
     use HTTPRequestTrait;
 
+    const FIRST_FETCH_DATE = '2016-03-01';
+
     /**
      * @param string $fetchUrl
      * @return array
@@ -37,6 +39,7 @@ class AdFetcher
             $done = false;
             $resultText = isset($result->error->message)?$result->error->message:'No response message received';
         }
+
         return [
             $done ,
             (isset($data))?$data:null ,
@@ -55,14 +58,13 @@ class AdFetcher
     {
         $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id])->orderByDesc('created_at')->first();
         if (is_null($lastFetch)) {
-            $fetchUrl = $source->fetch_url.'?timestamp=2016-03-01';
-        } else {
-            if ($lastFetch->current_page < $lastFetch->last_page) {
-                $fetchUrl = $lastFetch->next_page_url;
-            } else {
-                $fetchUrl = $source->fetch_url . '?timestamp=' . $lastFetch->updated_at;
-            }
+            return $source->fetch_url.'?timestamp='.self::FIRST_FETCH_DATE;
         }
-        return $fetchUrl;
+
+        if ($lastFetch->current_page < $lastFetch->last_page) {
+            return  $lastFetch->next_page_url;
+        } else {
+            return $source->fetch_url . '?timestamp=' . $lastFetch->updated_at;
+        }
     }
 }

@@ -22,20 +22,21 @@ class AdItemInserter
      */
     public function storeItem(stdClass $source, $item , AdPicTransferrer $adPicTransferrer): bool
     {
-        if(!$this->isValidItem($item))
-        {
+        if(!$this->isValidItem($item)){
             return false;
         }
 
+        $isPicTransferred = false;
         [$storeResult, $picPath] = $adPicTransferrer->storeAdPic(optional($item)->image);
-        if ($storeResult) {
-            [$picTransfer, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
-            if ($picTransfer) {
-                $item->image = $picUrl;
-            }
+        if ($storeResult){
+            [$isPicTransferred, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
         }
 
-        if ($this->hasBeenInserted($this->makeAdForeignId($source->id, optional($item)->id , optional($item)->type))) {
+        if ($isPicTransferred && isset($picUrl)){
+            $item->image = $picUrl;
+        }
+
+        if ($this->hasBeenInserted($this->makeAdForeignId($source->id, optional($item)->id , optional($item)->type))){
             $this->updateAdRecord($item);
             return true;
         }
