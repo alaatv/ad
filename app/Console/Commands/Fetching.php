@@ -83,31 +83,33 @@ class Fetching extends Command
             $counter = 0;
             $this->printInfo(["Fetching $fetchUrl"]);
             [$fetchDone , $items , $currentPage , $nextPageUrl , $lastPage, $resultText] = $this->adFetcher->fetchAd($fetchUrl);
-            if ($fetchDone) {
-                if (empty($items)) {
-                    $this->printInfo(["No items fetched in request for page $currentPage"]);
-                    continue;
-                }
-
-                $this->printInfo(['Inserting '.count($items).' items']);
-                $bar = $this->output->createProgressBar(count($items));
-                foreach ($items as $key => $item) {
-                    if($this->adItemInserter->storeItem($source, $item , $this->adPicTransferrer)){
-                        $bar->advance();
-                        $counter++;
-                    }
-                }
-                $bar->finish();
-                $bar->setProgress($counter);
-                $this->info("\n");
-
-                $this->insertOrUpdateFetch($source, $currentPage, $lastPage, $nextPageUrl);
-                $fetchUrl = $nextPageUrl;
-                $donePages++;
-            } else {
+            if(!$fetchDone){
                 $this->printInfo(["Failed on fetching $fetchUrl","response: $resultText"]);
                 $failedPages++;
+                continue;
             }
+
+            if (empty($items)) {
+                $this->printInfo(["No items fetched in request for page $currentPage"]);
+                continue;
+            }
+
+            $this->printInfo(['Inserting '.count($items).' items']);
+            $bar = $this->output->createProgressBar(count($items));
+            foreach ($items as $key => $item) {
+                if($this->adItemInserter->storeItem($source, $item , $this->adPicTransferrer)){
+                    $bar->advance();
+                    $counter++;
+                }
+            }
+            $bar->finish();
+            $bar->setProgress($counter);
+            $this->info("\n");
+
+            $this->insertOrUpdateFetch($source, $currentPage, $lastPage, $nextPageUrl);
+            $fetchUrl = $nextPageUrl;
+            $donePages++;
+
         } while ($currentPage < $lastPage );
 
         return [$donePages, $failedPages];
