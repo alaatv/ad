@@ -132,9 +132,9 @@ class Fetching extends Command
     {
         if ($currentPage == 1) {
             return $this->insertFetch($source->id, $currentPage, $lastPage, $nextPageUrl);
-        } else {
-            return $this->updateFetch($source->id, $currentPage, $nextPageUrl);
         }
+
+        return $this->updateFetch($source->id, $currentPage, $nextPageUrl);
     }
 
     /**
