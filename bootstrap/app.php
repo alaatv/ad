@@ -102,4 +102,7 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
+//Load Config Files
+$app->configure('download_server');
+
 return $app;

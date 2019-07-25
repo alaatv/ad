@@ -20,7 +20,7 @@ class HomeController extends Controller
     use adTrait;
 
     public function debug(Request $request){
-        //
+        dd( config('download_server.IMAGES_PARTIAL_PATH'));
     }
 
     /**
