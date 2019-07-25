@@ -9,6 +9,7 @@ use App\Repositories\Repo;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use stdClass;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class Fetching extends Command
 {
@@ -96,12 +97,7 @@ class Fetching extends Command
 
             $this->printInfo(['Inserting '.count($items).' items']);
             $bar = $this->output->createProgressBar(count($items));
-            foreach ($items as $key => $item) {
-                if($this->adItemInserter->storeItem($source, $item , $this->adPicTransferrer)){
-                    $bar->advance();
-                    $counter++;
-                }
-            }
+            $this->storeItems($source, $items, $bar, $counter);
             $bar->finish();
             $bar->setProgress($counter);
             $this->info("\n");
@@ -109,7 +105,6 @@ class Fetching extends Command
             $this->insertOrUpdateFetch($source, $currentPage, $lastPage, $nextPageUrl);
             $fetchUrl = $nextPageUrl;
             $donePages++;
-
         } while ($currentPage < $lastPage );
 
         return [$donePages, $failedPages];
@@ -175,5 +170,21 @@ class Fetching extends Command
             'next_page_url' => $nextPageUrl,
             'updated_at' => Carbon::now(),
         ]);
+    }
+
+    /**
+     * @param stdClass $source
+     * @param array $items
+     * @param ProgressBar $bar
+     * @param int $counter
+     */
+    private function storeItems(stdClass $source, array $items, ProgressBar $bar, int $counter): void
+    {
+        foreach ($items as $key => $item) {
+            if ($this->adItemInserter->storeItem($source, $item, $this->adPicTransferrer)) {
+                $bar->advance();
+                $counter++;
+            }
+        }
     }
 }
