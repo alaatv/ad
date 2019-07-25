@@ -45,7 +45,7 @@ class HomeController extends Controller
         $sources = SourceRepo::getValidSource($customer->id,$sourceNames,$urls)->get();
 
         if($sources->isEmpty()){
-            return response()->json($this->setErrorResponse(myResponse::NO_VALID_SOURCE_FOUND_FOR_CUSTOMER, 'NO valid source found for this customer'), Response::HTTP_NOT_FOUND);
+            return response()->json($this->setErrorResponse(myResponse::NO_VALID_SOURCE_FOUND_FOR_CUSTOMER, 'No valid source found for this customer'), Response::HTTP_NOT_FOUND);
         }
 
         $totalAds = $adResponseGenerator->makeAdsArray($sources, $numberOfAds);
