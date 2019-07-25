@@ -22,21 +22,26 @@ class AdItemInserter
      */
     public function storeItem(stdClass $source, $item , AdPicTransferrer $adPicTransferrer): bool
     {
-        $done = false;
-        if ($this->isValidItem($item) && $this->isInsertable($this->makeAdForeignId($source->id, optional($item)->id , optional($item)->type))) {
-            [$storeResult, $picPath] = $adPicTransferrer->storeAdPic(optional($item)->image);
-            if ($storeResult) {
-                [$picTransfer, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
-                if ($picTransfer) {
-                    $item->image = $picUrl;
-                }
-            }
-
-            $this->insertAdRecord($source, $item);
-            $done = true;
+        if(!$this->isValidItem($item))
+        {
+            return false;
         }
 
-        return $done;
+        [$storeResult, $picPath] = $adPicTransferrer->storeAdPic(optional($item)->image);
+        if ($storeResult) {
+            [$picTransfer, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
+            if ($picTransfer) {
+                $item->image = $picUrl;
+            }
+        }
+
+        if ($this->hasBeenInserted($this->makeAdForeignId($source->id, optional($item)->id , optional($item)->type))) {
+            $this->updateAdRecord($item);
+            return true;
+        }
+
+        $this->insertAdRecord($source, $item);
+        return true;
     }
 
     /**
@@ -58,6 +63,17 @@ class AdItemInserter
         ]);
     }
 
+    private function updateAdRecord($item)
+    {
+        Repo::updateRecord('ads', [
+            'type' => optional($item)->type,
+            'name' => optional($item)->name,
+            'image' => optional($item)->image,
+            'link' => optional($item)->link,
+            'updated_at' => Carbon::now(),
+        ]);
+    }
+
     /**
      * @param $item
      * @return bool
@@ -67,9 +83,9 @@ class AdItemInserter
         return isset($item->id) && isset($item->name) && isset($item->link) && isset($item->image);
     }
 
-    private function isInsertable(string $adId):bool
+    private function hasBeenInserted(string $adId):bool
     {
         $ad = Repo::getRecords('ads', ['id'] ,['foreign_id'=>$adId])->first();
-        return (isset($ad))?false:true;
+        return (isset($ad))?true:false;
     }
 }
