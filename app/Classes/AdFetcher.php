@@ -27,27 +27,7 @@ class AdFetcher
     public function fetchAd(string $fetchUrl): array
     {
         $response = $this->sendRequest($fetchUrl, 'POST', [], self::FETCHING_REQUEST_HEADERS);
-        $result = json_decode($response['result']);
-        if($response['statusCode'] == Response::HTTP_OK){
-            $done = true;
-            $data = (isset($result->data)) ? $result->data : [];
-            $currentPage  = optional($result)->current_page;
-            $nextPageUrl = optional($result)->next_page_url;
-            $lastPage = optional($result)->last_page;
-            $resultText = 'Fetched successfully';
-        }else{
-            $done = false;
-            $resultText = isset($result->error->message)?$result->error->message:'No response message received';
-        }
-
-        return [
-            $done ,
-            (isset($data))?$data:null ,
-            (isset($currentPage))?$currentPage:null ,
-            (isset($nextPageUrl))?$nextPageUrl:null ,
-            (isset($lastPage))?$lastPage:null ,
-            $resultText,
-        ];
+        return $this->getRequestResult($response);
     }
 
     /**
@@ -63,8 +43,37 @@ class AdFetcher
 
         if ($lastFetch->current_page < $lastFetch->last_page) {
             return  $lastFetch->next_page_url;
-        } else {
-            return $source->fetch_url . '?timestamp=' . $lastFetch->updated_at;
         }
+
+        return $source->fetch_url . '?timestamp=' . $lastFetch->updated_at;
+    }
+
+    /**
+     * @param array $response
+     * @return array
+     */
+    private function getRequestResult(array $response): array
+    {
+        $result = json_decode($response['result']);
+        if ($response['statusCode'] == Response::HTTP_OK) {
+            $done = true;
+            $data = (isset($result->data)) ? $result->data : [];
+            $currentPage = optional($result)->current_page;
+            $nextPageUrl = optional($result)->next_page_url;
+            $lastPage = optional($result)->last_page;
+            $resultText = 'Fetched successfully';
+        } else {
+            $done = false;
+            $resultText = isset($result->error->message) ? $result->error->message : 'No response message received';
+        }
+
+        return [
+                $done ,
+                (isset($data))?$data:null ,
+                (isset($currentPage))?$currentPage:null ,
+                (isset($nextPageUrl))?$nextPageUrl:null ,
+                (isset($lastPage))?$lastPage:null ,
+                $resultText,
+            ];
     }
 }
