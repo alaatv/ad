@@ -81,6 +81,7 @@ class Fetching extends Command
         $donePages = 0;
 
         do {
+            //ToDo put in jobs
             $counter = 0;
             $this->printInfo(["Fetching $fetchUrl"]);
             [$fetchDone , $items , $currentPage , $nextPageUrl , $lastPage, $resultText] = $this->adFetcher->fetchAd($fetchUrl);
