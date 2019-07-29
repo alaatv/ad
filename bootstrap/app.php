@@ -84,6 +84,7 @@ $app->singleton('filesystem', function ($app) {
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 // $app->register(App\Providers\RouteServiceProvider::class);
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -104,5 +105,7 @@ $app->router->group([
 
 //Load Config Files
 $app->configure('download_server');
+$app->configure('queue');
+$app->configure('database');
 
 return $app;

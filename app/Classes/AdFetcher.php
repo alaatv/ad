@@ -6,6 +6,7 @@ namespace App\Classes;
 
 use App\Repositories\Repo;
 use App\Traits\HTTPRequestTrait;
+use Carbon\Carbon;
 use Illuminate\Http\Response;
 use stdClass;
 
@@ -38,6 +39,7 @@ class AdFetcher
     {
         $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id])->orderByDesc('created_at')->first();
         if (is_null($lastFetch)) {
+//            return $source->fetch_url.'?timestamp='.Carbon::parse(self::FIRST_FETCH_DATE)->timestamp;
             return $source->fetch_url.'?timestamp='.self::FIRST_FETCH_DATE;
         }
 
@@ -45,7 +47,8 @@ class AdFetcher
             return  $lastFetch->next_page_url;
         }
 
-        return $source->fetch_url . '?timestamp=' . $lastFetch->updated_at;
+//        return $source->fetch_url . '?timestamp=' . Carbon::parse($lastFetch->updated_at)->timestamp;
+        return $source->fetch_url . '?timestamp=' . self::FIRST_FETCH_DATE;
     }
 
     /**
