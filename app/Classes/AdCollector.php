@@ -18,7 +18,7 @@ class AdCollector
     {
         $totalAds = [];
         foreach ($sources as $source) {
-            $ads = Repo::getRecords('ads', ['UUID', 'name', 'link', 'image'], ['source_id' => $source->id, 'enable' => 1]);
+            $ads = Repo::getRecords('ads', ['UUID', 'name', 'link', 'image'], ['source_id' => $source->id, 'enable' => 1])->orderByRaw('RAND()');
             $ads = $ads->paginate($numberOfAds, ['*'], 'page');
             $this->generateAdLinks($ads);
             $this->generateAdPicLinks($ads);
