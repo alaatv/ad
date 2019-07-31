@@ -13,8 +13,11 @@ use Symfony\Component\Console\Helper\ProgressBar;
 
 class FetchAd extends Job
 {
+    /** @var AdFetcher $adFetcher */
     private $adFetcher;
+    /** @var AdItemInserter $adItemInserter */
     private $adItemInserter;
+    /** @var AdPicTransferrer $adPicTransferrer */
     private $adPicTransferrer;
     private $sourceName;
 
@@ -45,9 +48,6 @@ class FetchAd extends Job
         $source = Repo::getRecords('sources' , ['*'], ['name'=>$this->sourceName])->first();
         if(isset($source)){
             [$donePages, $failedPages] = $this->fetch($source);
-//            $this->printInfo(['total fetched pages: '.$donePages,'total failed pages: '.$failedPages]);
-        }else{
-//            $this->printInfo(['Source not found']);
         }
     }
 
@@ -59,35 +59,25 @@ class FetchAd extends Job
     {
         $fetchUrl = $this->adFetcher->getFetchUrl($source);
         if(is_null($fetchUrl)) {
-//            $this->printInfo(['Fetch Url not found']);
             return [0, 0];
         }
 
-//        $this->printInfo(['Start fetching...']);
         $failedPages = 0;
         $donePages = 0;
 
         do {
             $counter = 0;
-//            $this->printInfo(["Fetching $fetchUrl"]);
             [$fetchDone , $items , $currentPage , $nextPageUrl , $lastPage, $resultText] = $this->adFetcher->fetchAd($fetchUrl);
             if(!$fetchDone){
-//                $this->printInfo(["Failed on fetching $fetchUrl","response: $resultText"]);
                 $failedPages++;
                 continue;
             }
 
             if (empty($items)) {
-//                $this->printInfo(["No items fetched in request for page $currentPage"]);
                 continue;
             }
 
-//            $this->printInfo(['Inserting '.count($items).' items']);
-//            $bar = $this->output->createProgressBar(count($items));
             $this->storeItems($source, $items, $counter);
-//            $bar->finish();
-//            $bar->setProgress($counter);
-//            $this->info("\n");
 
             $this->insertOrUpdateFetch($source, $currentPage, $lastPage, $nextPageUrl);
             $fetchUrl = $nextPageUrl;

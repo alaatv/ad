@@ -52,15 +52,16 @@ class AdItemInserter
     private function insertAdRecord(stdClass $source, $item): void
     {
         Repo::insertRecord('ads', [
-            'UUID'  => Str::uuid()->toString() ,
-            'source_id' => $source->id,
-            'foreign_id' => $this->makeAdForeignId($source->id , optional($item)->id , optional($item)->type),
-            'type' => optional($item)->type,
-            'name' => optional($item)->name,
-            'image' => optional($item)->image,
-            'link' => optional($item)->link,
-            'enable' => 1,
-            'created_at' => Carbon::now(),
+            'UUID'        => Str::uuid()->toString() ,
+            'source_id'   => $source->id,
+            'foreign_id'  => $this->makeAdForeignId($source->id , optional($item)->id , optional($item)->type),
+            'type'        => optional($item)->type,
+            'name'        => optional($item)->name,
+            'image'       => optional($item)->image,
+            'link'        => optional($item)->link,
+            'tags'        => (is_array(optional($item)->tags))?json_encode(optional($item)->tags):null,
+            'enable'      => 1,
+            'created_at'  => Carbon::now(),
         ]);
     }
 

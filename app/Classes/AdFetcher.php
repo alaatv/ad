@@ -39,14 +39,14 @@ class AdFetcher
     {
         $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id])->orderByDesc('created_at')->first();
         if (is_null($lastFetch)) {
-            return $source->fetch_url.'?timestamp='.Carbon::parse(self::FIRST_FETCH_DATE)->timestamp;
+            return $source->fetch_url.'&timestamp='.Carbon::parse(self::FIRST_FETCH_DATE)->timestamp;
         }
 
         if ($lastFetch->current_page < $lastFetch->last_page) {
             return  $lastFetch->next_page_url;
         }
 
-        return $source->fetch_url . '?timestamp=' . Carbon::parse($lastFetch->updated_at)->timestamp;
+        return $source->fetch_url . '&timestamp=' . Carbon::parse($lastFetch->updated_at)->timestamp;
     }
 
     /**

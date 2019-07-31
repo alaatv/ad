@@ -20,7 +20,7 @@ class HomeController extends Controller
     use adTrait;
 
     public function debug(Request $request){
-        dd( config('download_server.IMAGES_PARTIAL_PATH'));
+
     }
 
     /**
@@ -86,9 +86,7 @@ class HomeController extends Controller
         }
 
         $redirectUrl = $request->get('redirect' , $ad->link);
-        return redirect($redirectUrl);
-        //ToDo pass redirectUrl to an HTML form
-//        return view('adForm' , compact($redirectUrl));
+        return view('redirectForm' , ['redirectUrl'=>$redirectUrl]);
     }
 
 }
