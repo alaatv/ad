@@ -16,9 +16,9 @@ class AdFetcher
 
     const FIRST_FETCH_DATE = '2016-03-01';
     const FETCHING_REQUEST_HEADERS = [
-        'Content-Type' => 'application/json',
-        'Accept' => 'application/json',
-        'X-Requested-With' => 'XMLHttpRequest'
+        'Content-Type'      => 'application/json',
+        'Accept'            => 'application/json',
+        'X-Requested-With'  => 'XMLHttpRequest'
     ];
 
     /**
