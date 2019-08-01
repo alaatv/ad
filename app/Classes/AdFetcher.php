@@ -72,7 +72,7 @@ class AdFetcher
                 $done ,
                 (isset($data))?$data:null ,
                 (isset($currentPage))?$currentPage:null ,
-                (isset($nextPageUrl))?$nextPageUrl:null ,
+                (isset($nextPageUrl) && strlen($nextPageUrl)>0)?$nextPageUrl:null ,
                 (isset($lastPage))?$lastPage:null ,
                 $resultText,
             ];
