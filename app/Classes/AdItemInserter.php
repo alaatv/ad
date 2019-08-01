@@ -26,14 +26,13 @@ class AdItemInserter
             return false;
         }
 
-        $isPicTransferred = false;
-        [$storeResult, $picPath] = $adPicTransferrer->storeAdPic(optional($item)->image);
-        if ($storeResult){
-            [$isPicTransferred, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
-        }
+        [$isPicTransferred, $picUrl] = $this->putAdPicToCDN($item, $adPicTransferrer);
 
-        if ($isPicTransferred && isset($picUrl)){
+        $item->image = null;
+        $item->enable = 0;
+        if ($isPicTransferred){
             $item->image = $picUrl;
+            $item->enable = 1;
         }
 
         if ($this->hasBeenInserted($this->makeAdForeignId($source->id, optional($item)->id , optional($item)->type))){
@@ -60,7 +59,7 @@ class AdItemInserter
             'image'       => optional($item)->image,
             'link'        => optional($item)->link,
             'tags'        => (is_array(optional($item)->tags))?json_encode(optional($item)->tags):null,
-            'enable'      => 1,
+            'enable'      => $item->enable,
             'created_at'  => Carbon::now(),
         ]);
     }
@@ -89,5 +88,21 @@ class AdItemInserter
     {
         $ad = Repo::getRecords('ads', ['id'] ,['foreign_id'=>$adId])->first();
         return (isset($ad))?true:false;
+    }
+
+    /**
+     * @param $item
+     * @param AdPicTransferrer $adPicTransferrer
+     * @return array
+     */
+    private function putAdPicToCDN($item, AdPicTransferrer $adPicTransferrer): array
+    {
+        $isPicTransferred = false;
+        $picUrl=null;
+        [$storeResult, $picPath] = $adPicTransferrer->storeAdPic(optional($item)->image);
+        if ($storeResult) {
+            [$isPicTransferred, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
+        }
+        return [$isPicTransferred, $picUrl];
     }
 }
