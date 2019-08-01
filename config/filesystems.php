@@ -45,6 +45,12 @@ return [
     */
 
     'disks' => [
+        'adImage' => [
+            'driver'     => 'local',
+            'root'       => storage_path('app/public/images/ads'),
+            'visibility' => 'public',
+        ],
+
         'adPicsSFTP'     => [
             'driver'     => 'sftp',
             'host'       => env('SFTP_HOST', ''),
@@ -72,7 +78,6 @@ return [
             'dHost'      => "cdn.alaatv.com",
             'dProtocol'  => "https://",
         ],
-
 
 
         's3' => [
