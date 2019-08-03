@@ -1,10 +1,10 @@
 let mix = require('laravel-mix');
 
 
-mix.sass('resources/scss/adEngine.scss', 'public/css')
+mix.sass('resources/scss/engine.scss', 'public/css')
     .scripts(
         [
-            'resources/js/adEngine.js',
-        ],'public/js/adEngine.js'
+            'resources/js/engine.js',
+        ],'public/js/engine.js'
     )
     .version();

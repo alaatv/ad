@@ -85,8 +85,10 @@ class HomeController extends Controller
             return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'), Response::HTTP_NOT_FOUND);
         }
 
-        $redirectUrl = $request->get('redirect' , $ad->link);
-        return view('redirectForm' , ['redirectUrl'=>$redirectUrl]);
+        return view('redirectForm' , ['redirectUrl'=> $request->get('redirect' , $ad->link)]);
     }
 
+    public function adTest(Request $request){
+        return view('adTest');
+    }
 }

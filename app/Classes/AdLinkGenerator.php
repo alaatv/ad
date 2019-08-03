@@ -20,6 +20,6 @@ class AdLinkGenerator
     }
 
     public function generateLink(){
-        $this->ad->link = env('APP_URL').'/ad/'.$this->ad->UUID.'/click?redirect='.$this->ad->link;
+        $this->ad->link = env('APP_URL').'/tabligh/'.$this->ad->UUID.'/click?redirect='.$this->ad->link;
     }
 }

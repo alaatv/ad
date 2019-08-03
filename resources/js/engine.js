@@ -1,7 +1,7 @@
 class Ajax {
 
     constructor(adDomClass, adDomData) {
-        this.url = 'http://a.alaatv.com/debug1';
+        this.url = 'http://192.168.5.34:8000';
         // Create a new XMLHttpRequest object
         this.xhr = new XMLHttpRequest();
         this.configureXMLHttpRequest(adDomClass, adDomData);
@@ -49,7 +49,7 @@ class Ajax {
                 let k = prefix ? prefix + "[" + p + "]" : p,
                     v = obj[p];
                 str.push((v !== null && typeof v === "object") ?
-                    serialize(v, k) :
+                    this.serialize(v, k) :
                     encodeURIComponent(k) + "=" + encodeURIComponent(v));
             }
         }
@@ -60,25 +60,22 @@ class Ajax {
 let AlaaAds = function () {
 
     let attr_showFromOthers = 'sfo';
-    let attr_blockSize = 'alaa-ad-size';
 
     function buildAllDoms() {
         let x = document.getElementsByClassName('AlaaAdDom');
         let i;
         let domLength = x.length;
         for (let i = 0; i < domLength; i++) {
-            let dom = x[i];
-            let showFromOthers = dom.getAttribute(attr_showFromOthers);
-            let blockSize = dom.getAttribute(attr_blockSize);
-            let adDomClass = createAdDomClass(i);
-            dom.classList.add(adDomClass);
-            for (let j = 0, atts = dom.attributes, n = atts.length, domAttrData = []; j < n; j++){
+            let dom = x[i],
+                adDomClass = createAdDomClass(i),
+                domAttrData = {};
+            dom.classList.add(adDomClass),
+                atts = dom.attributes,
+                n = atts.length;
+            for (let j = 0; j < n; j++){
                 let res = atts[j].nodeName.match(/alaa-ad-.*/g);
                 if(res !== null) {
-                    domAttrData.push({
-                        'name': atts[j].nodeName,
-                        'value': atts[j].value
-                    });
+                    domAttrData[atts[j].nodeName.replace('alaa-ad-', '')]=atts[j].value;
                 }
             }
 
@@ -124,8 +121,8 @@ let AlaaAds = function () {
 
     function createItem(data, adDomData) {
         let blockSize = '';
-        if (typeof adDomData.blockSize !== 'undefined') {
-            blockSize = adDomData.blockSize;
+        if (typeof adDomData.size !== 'undefined') {
+            blockSize = adDomData.size;
         }
         return '' +
             '            <div class="adsAlaatvRecomenderBlock-item '+blockSize+'">\n' +
@@ -176,4 +173,4 @@ let AlaaAds = function () {
 }();
 
 AlaaAds.load();
-AlaaAds.loadFile('http://a.alaatv.com/css/page-RecomenderEngine.css', 'css');
+AlaaAds.loadFile('http://192.168.5.34:8000/css/engine.css', 'css');

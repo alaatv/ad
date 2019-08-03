@@ -30,6 +30,7 @@ use Illuminate\Support\Str;
 
 //$router->get('/', [HomeController::class , 'index']);  Not working in lumen
 $router->get('/', 'HomeController@index');
-$router->post('/fetchAd', 'HomeController@fetchAds');
-$router->get('ad/{UUID}/click', 'HomeController@adClick');
+$router->post('fetchAd', 'HomeController@fetchAds');
+$router->get('tabligh/{UUID}/click', 'HomeController@adClick');
 $router->get('debug', 'HomeController@debug');
+$router->get('test', 'HomeController@adTest');
