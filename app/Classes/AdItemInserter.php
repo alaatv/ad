@@ -67,10 +67,13 @@ class AdItemInserter
     private function updateAdRecord($item)
     {
         Repo::updateRecord('ads', [
+            'foreign_id'  => $this->makeAdForeignId($source->id , optional($item)->id , optional($item)->type),
             'type' => optional($item)->type,
             'name' => optional($item)->name,
             'image' => optional($item)->image,
             'link' => optional($item)->link,
+            'tags'        => (is_array(optional($item)->tags))?json_encode(optional($item)->tags):null,
+            'enable'      => $item->enable,
             'updated_at' => Carbon::now(),
         ]);
     }
