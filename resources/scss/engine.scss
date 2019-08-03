@@ -1,0 +1,177 @@
+.AlaaAdDom,
+.AlaaAdDom .AlaaAdDom-block .AlaaAdDom-block-title,
+.AlaaAdDom .AlaaAdDom-block .AlaaAdDom-itemsWraper {
+    max-width: 100%;
+    min-width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    direction: rtl;
+}
+.AlaaAdDom .AlaaAdDom-block {
+    margin-top: 15px;
+    .AlaaAdDom-block-title {
+        height: 45px;
+        line-height: 45px;
+        background: white;
+        padding: 0;
+        margin-bottom: 10px;
+        align-items: center;
+        h3 {
+            font-size: 17px;
+            line-height: 45px;
+            height: 45px;
+            margin-right: 10px;
+        }
+    }
+    .AlaaAdDom-itemsWraper {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+
+        @mixin make-size-media($sizeName,
+                                    $column-count-1701pxToHigher,
+                                    $column-count-BW1281pxTo1700px,
+                                    $column-count-BW1025pxTo1280px,
+                                    $column-count-BW768pxTo1024px,
+                                    $column-count-BW768pxTo1024px-px-landscape,
+                                    $column-count-BW481pxTo767px,
+                                    $column-count-BW320pxTo480px
+        ) {
+
+            /*
+              ##Device = Desktops
+              ##Screen = 1701px to higher resolution desktops
+            */
+            @media (min-width: 1701px) {
+                .adsAlaatvRecomenderBlock-item.#{$sizeName} {
+                    //width: 20%;
+                    width: $column-count-1701pxToHigher;
+                }
+            }
+
+            /*
+              ##Device = Desktops
+              ##Screen = B/w 1281px to 1700px
+            */
+            @media (min-width: 1281px) and (max-width: 1700px) {
+                .adsAlaatvRecomenderBlock-item.#{$sizeName} {
+                    width: $column-count-BW1281pxTo1700px;
+                }
+            }
+
+            /*
+              ##Device = Laptops, Desktops
+              ##Screen = B/w 1025px to 1280px
+            */
+            @media (min-width: 1025px) and (max-width: 1280px) {
+                .adsAlaatvRecomenderBlock-item.#{$sizeName} {
+                    width: $column-count-BW1025pxTo1280px;
+                }
+            }
+
+            /*
+              ##Device = Tablets, Ipads (portrait)
+              ##Screen = B/w 768px to 1024px
+            */
+            @media (min-width: 768px) and (max-width: 1024px) {
+                .adsAlaatvRecomenderBlock-item.#{$sizeName} {
+                    width: $column-count-BW768pxTo1024px;
+                }
+            }
+
+            /*
+              ##Device = Tablets, Ipads (landscape)
+              ##Screen = B/w 768px to 1024px
+            */
+            @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+                .adsAlaatvRecomenderBlock-item.#{$sizeName} {
+                    width: $column-count-BW768pxTo1024px-px-landscape;
+                }
+            }
+
+            /*
+              ##Device = Low Resolution Tablets, Mobiles (Landscape)
+              ##Screen = B/w 481px to 767px
+            */
+            @media (min-width: 481px) and (max-width: 767px) {
+                .adsAlaatvRecomenderBlock-item.#{$sizeName} {
+                    width: $column-count-BW481pxTo767px;
+                }
+            }
+
+            /*
+              ##Device = Most of the Smartphones Mobiles (Portrait)
+              ##Screen = B/w 320px to 480px
+            */
+            @media (min-width: 320px) and (max-width: 480px) {
+                .adsAlaatvRecomenderBlock-item.#{$sizeName} {
+                    width: $column-count-BW320pxTo480px;
+                }
+            }
+        }
+
+
+
+        @include make-size-media('size-width-full',
+            percentage(1/7),
+            percentage(1/6),
+            percentage(1/5),
+            percentage(1/3),
+            percentage(1/4),
+            percentage(1/3),
+            percentage(1/2)
+        );
+
+        @include make-size-media('size-width-9',
+            percentage(1/6),
+            percentage(1/5),
+            percentage(1/4),
+            percentage(1/2),
+            percentage(1/3),
+            percentage(1/2),
+            percentage(1/1)
+        );
+
+        @include make-size-media('size-width-6',
+            percentage(1/4),
+            percentage(1/3),
+            percentage(1/3),
+            percentage(1/2),
+            percentage(1/2),
+            percentage(1/2),
+            percentage(1/1)
+        );
+
+        @include make-size-media('size-width-3',
+            percentage(1/2),
+            percentage(1/2),
+            percentage(1/1),
+            percentage(1/1),
+            percentage(1/1),
+            percentage(1/1),
+            percentage(1/1)
+        );
+
+        .adsAlaatvRecomenderBlock-item {
+            width: 100%;
+
+            .item-pic {
+                padding: 0 5px;
+                img {
+                    max-width: 100%;
+                    min-width: 100%;
+                }
+            }
+            .item-name {
+                margin: 0 5px 5px 5px;
+                text-align: center;
+                height: 30px;
+                line-height: 30px;
+                a {
+                    text-decoration: none;
+                    color: inherit;
+                }
+            }
+        }
+    }
+}
