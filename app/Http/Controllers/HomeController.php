@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Classes\AdCollector;
-use App\Classes\GoogleAnalytics\EventTrackingHit;
 use App\Classes\GoogleAnalyticsGenerator;
 use App\Repositories\Repo;
 use App\Repositories\SourceRepo;

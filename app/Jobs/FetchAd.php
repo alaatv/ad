@@ -158,7 +158,7 @@ class FetchAd extends Job
     private function storeItems(stdClass $source, array $items, int $counter): void
     {
         foreach ($items as $key => $item) {
-            if ($this->adItemInserter->storeItem($source, $item, $this->adPicTransferrer)) {
+            if ($this->adItemInserter->storeOrUpdateItem($source, $item, $this->adPicTransferrer)) {
 //                $bar->advance();
                 $counter++;
             }

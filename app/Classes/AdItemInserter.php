@@ -20,7 +20,7 @@ class AdItemInserter
      * @param AdPicTransferrer $adPicTransferrer
      * @return bool
      */
-    public function storeItem(stdClass $source, $item , AdPicTransferrer $adPicTransferrer): bool
+    public function storeOrUpdateItem(stdClass $source, $item , AdPicTransferrer $adPicTransferrer): bool
     {
         if(!$this->isValidItem($item)){
             return false;
@@ -67,7 +67,6 @@ class AdItemInserter
     private function updateAdRecord($item)
     {
         Repo::updateRecord('ads', [
-            'foreign_id'  => $this->makeAdForeignId($source->id , optional($item)->id , optional($item)->type),
             'type' => optional($item)->type,
             'name' => optional($item)->name,
             'image' => optional($item)->image,
