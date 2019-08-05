@@ -33,18 +33,14 @@ class AdCollector
     private function generateAdLinks(LengthAwarePaginator $ads): void
     {
         foreach ($ads as $ad) {
-            // ToDo : Refactor
-            $adLinkGenerator = new AdLinkGenerator($ad);
-            $adLinkGenerator->generateLink();
+            (new AdLinkGenerator($ad))->generateLink();
         }
     }
 
     private function generateAdPicLinks(LengthAwarePaginator $ads)
     {
         foreach ($ads as $ad) {
-            // ToDo : Refactor
-            $adLinkGenerator = new AdPicLinkGenerator($ad);
-            $adLinkGenerator->generatePicLink();
+            (new AdPicLinkGenerator($ad))->generatePicLink();
         }
     }
 

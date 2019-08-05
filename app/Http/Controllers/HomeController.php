@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Classes\AdCollector;
+use App\Classes\GoogleAnalytics\EventTrackingHit;
+use App\Classes\GoogleAnalyticsGenerator;
 use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
 use App\Traits\adTrait;
@@ -34,8 +36,8 @@ class HomeController extends Controller
         $sourceNames    = $request->get('source' , []);
         $urls           = $request->get('urls' , []);
         $customer = Repo::getRecords('users', ['*'], ['UUID'=>$customerUUID])->first();
-        if(!isset($customer)){
-            return response()->json($this->setErrorResponse(myResponse::USER_NOT_FOUND, 'User not found'), Response::HTTP_NOT_FOUND);
+        if(is_null($customer)){
+            return response()->json($this->setErrorResponse(myResponse::USER_NOT_FOUND, 'User not found'));
         }
 
         if(is_string($sourceNames)){
@@ -43,9 +45,8 @@ class HomeController extends Controller
         }
 
         $sources = SourceRepo::getValidSource($customer->id,$sourceNames,$urls)->get();
-
         if($sources->isEmpty()){
-            return response()->json($this->setErrorResponse(myResponse::NO_VALID_SOURCE_FOUND_FOR_CUSTOMER, 'No valid source found for this customer'), Response::HTTP_NOT_FOUND);
+            return response()->json($this->setErrorResponse(myResponse::NO_VALID_SOURCE_FOUND_FOR_CUSTOMER, 'No valid source found for this customer'));
         }
 
         $totalAds = $adResponseGenerator->makeAdsArray($sources, $numberOfAds);
@@ -54,14 +55,14 @@ class HomeController extends Controller
 
     public function fetchAd(Request $request){
         //ToDo : security alert : any one can update Chibekhoonam ads
-        $itemID = $request->get('item_id');
-        $itemType = $request->get('item_type');
-        $sourceName = $request->get('source');
+        $itemID         = $request->get('item_id');
+        $itemType       = $request->get('item_type');
+        $sourceName     = $request->get('source');
         $source = Repo::getRecords('sources', ['*'], ['name'=>$sourceName])->first();
         $ad = Repo::getRecords('ads', ['*'], [$this->makeAdForeignId($source->id , $itemID , $itemType)])->first();
 
-        if(!isset($ad)){
-            return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'), Response::HTTP_NOT_FOUND);
+        if(is_null($ad)){
+            return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'));
         }
 
         $update = DB::table('ads')->update([
@@ -74,16 +75,23 @@ class HomeController extends Controller
             return response()->json([
                 'message'   =>  'ad has been updated successfully'
             ]);
-        }else{
-            return response()->json($this->setErrorResponse(myResponse::AD_UPDATE_DATABASE_ERROR, 'Database error on updating ad'), Response::HTTP_SERVICE_UNAVAILABLE);
         }
+
+        return response()->json($this->setErrorResponse(myResponse::AD_UPDATE_DATABASE_ERROR, 'Database error on updating ad'));
     }
 
-    public function adClick(Request $request, string $UUID){
+    public function adClick(Request $request , string $UUID){
         $ad = Repo::getRecords('ads' , ['*'] , ['UUID'=>$UUID])->first();
-        if(!isset($ad)){
-            return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'), Response::HTTP_NOT_FOUND);
+        if(is_null($ad)){
+            return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'));
         }
+
+//        (new EventTrackingHit('UA-XXXXX-Y', 555))->addToParameters([
+//            'ec'  => 'video',
+//            'ea'  => 'play',
+//            'el'  => 'holiday',
+//            'ev'  =>  300
+//        ])->send();
 
         return view('redirectForm' , ['redirectUrl'=> $request->get('redirect' , $ad->link)]);
     }
