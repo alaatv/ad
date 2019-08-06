@@ -20,7 +20,7 @@ class CreateSourcesTable extends Migration
             $table->string('display_name')->nullable()->comment('نام قابل نمایش منبع');
             $table->string('description')->nullable()->comment('توصیج منبع');
             $table->string('fetch_url')->nullable()->comment('آدرس برای فچ کردن محتواهای این سایت');
-            $table->tinyInteger('enable')->default(1)->comment('فعال یا غیرفعال');
+            $table->boolean('enable')->default(1)->comment('فعال یا غیرفعال');
             $table->timestamps();
             $table->softDeletes();
         });

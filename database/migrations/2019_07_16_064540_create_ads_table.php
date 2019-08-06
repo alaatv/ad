@@ -24,7 +24,7 @@ class CreateAdsTable extends Migration
             $table->string('image')->nullable()->comment('مسیر عکس تبلیغ');
             $table->string('link')->nullable()->comment('لینک تبلیغ');
             $table->string('tags')->nullable()->comment('تگ های تبلیغ');
-            $table->tinyInteger('enable')->default(1)->comment('فعال یا غیرفعال');
+            $table->boolean('enable')->default(1)->comment('فعال یا غیرفعال');
             $table->timestamps();
             $table->softDeletes();
 
