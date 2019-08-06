@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Ad;
 use App\Classes\AdCollector;
-use App\Classes\GoogleAnalyticsGenerator;
+use App\Classes\AdRedirectUrlGenerator;
 use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
 use App\Traits\adTrait;
@@ -30,10 +31,11 @@ class HomeController extends Controller
      * @return JsonResponse
      */
     public function index(Request $request , AdCollector $adResponseGenerator){
-        $numberOfAds    = $request->get('numberOfAds' , 6);
-        $customerUUID   = $request->get('UUID');
-        $sourceNames    = $request->get('source' , []);
-        $urls           = $request->get('urls' , []);
+        $numberOfAds    = $request->input('numberOfAds' , 6);
+        $customerUUID   = $request->input('UUID');
+        $sourceNames    = $request->input('source' , []);
+        $urls           = $request->input('urls' , []);
+
         $customer = Repo::getRecords('users', ['*'], ['UUID'=>$customerUUID])->first();
         if(is_null($customer)){
             return response()->json($this->setErrorResponse(myResponse::USER_NOT_FOUND, 'User not found'));
@@ -54,9 +56,9 @@ class HomeController extends Controller
 
     public function fetchAd(Request $request){
         //ToDo : security alert : any one can update Chibekhoonam ads
-        $itemID         = $request->get('item_id');
-        $itemType       = $request->get('item_type');
-        $sourceName     = $request->get('source');
+        $itemID         = $request->input('item_id');
+        $itemType       = $request->input('item_type');
+        $sourceName     = $request->input('source');
         $source = Repo::getRecords('sources', ['*'], ['name'=>$sourceName])->first();
         $ad = Repo::getRecords('ads', ['*'], [$this->makeAdForeignId($source->id , $itemID , $itemType)])->first();
 
@@ -65,9 +67,9 @@ class HomeController extends Controller
         }
 
         $update = DB::table('ads')->update([
-           'name'   => $request->get('name' , optional($ad)->name),
-           'image'  => $request->get('link' , optional($ad)->link),
-           'link'   => $request->get('image' , optional($ad)->image),
+           'name'   => $request->input('name' , optional($ad)->name),
+           'image'  => $request->input('link' , optional($ad)->link),
+           'link'   => $request->input('image' , optional($ad)->image),
         ]);
 
         if($update){
@@ -81,18 +83,19 @@ class HomeController extends Controller
 
     public function adClick(Request $request , string $UUID){
         $ad = Repo::getRecords('ads' , ['*'] , ['UUID'=>$UUID])->first();
+        Ad::setReferer($ad, $request->headers->get('referer'));
         if(is_null($ad)){
             return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'));
         }
 
-//        (new EventTrackingHit('UA-XXXXX-Y', 555))->addToParameters([
+//        (new EventTrackingHit('UA-XXXXX-Y', 555))->addParameters([
 //            'ec'  => 'video',
 //            'ea'  => 'play',
 //            'el'  => 'holiday',
 //            'ev'  =>  300
 //        ])->send();
 
-        return view('redirectForm' , ['redirectUrl'=> $request->get('redirect' , $ad->link)]);
+        return view('redirectForm' , ['redirectUrl'=> ( new AdRedirectUrlGenerator($ad))->generateUrl()]);
     }
 
     public function adTest(Request $request){

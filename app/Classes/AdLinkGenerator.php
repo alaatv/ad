@@ -19,7 +19,21 @@ class AdLinkGenerator
         $this->ad = $ad;
     }
 
-    public function generateLink(){
-        $this->ad->link = env('APP_URL').'/tabligh/'.$this->ad->UUID.'/click?redirect='.$this->ad->link;
+    public function generateLink()
+    {
+        $this->ad->link = $this->concatRedirectQueryToUrl($this->getAdBasicUrl());
+    }
+
+    /**
+     * @return string
+     */
+    private function getAdBasicUrl(): string
+    {
+        return route('ad.click', ['UUID' => $this->ad->UUID ]).'?';
+    }
+
+    private function concatRedirectQueryToUrl(string $baseUrl):string
+    {
+        return $baseUrl.'&redirect='.$this->ad->link;
     }
 }
