@@ -10,7 +10,7 @@ use PHPUnit\Framework\Exception;
 
 trait HTTPRequestTrait
 {
-    protected function sendRequest(string $path, string $method, array $parameters = [] , array $headers = [] ,  $sink=null)
+    protected function sendRequest(string $path, string $method, array $parameters = null , array $headers = null ,  $sink=null)
     {
         $client  = new Client();
         try {

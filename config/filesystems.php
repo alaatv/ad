@@ -58,7 +58,7 @@ return [
             'username'   => env('SFTP_USERNAME', ''),
             'password'   => env('SFTP_PASSSWORD', ''),
             'privateKey' => env('SFTP_PRIVATE_KEY_PATH', ''),
-            'root'       => env('SFTP_ROOT','').env('DOWNLOAD_SERVER_IMAGES_PARTIAL_PATH','').'/ads',
+            'root'       => env('SFTP_ROOT','').env('DOWNLOAD_SERVER_IMAGES_PARTIAL_PATH','').'/tabligh',
             'timeout'    => env('SFTP_TIMEOUT', '10'),
             'prefix'     => null,
             'dHost'      => env('DOWNLOAD_SERVER_NAME',''),

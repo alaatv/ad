@@ -30,7 +30,7 @@ class AdPicTransferrer
             $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename($picUrl);
             $filePath = fopen($pathToSave, 'w');
 
-            $response = $this->sendRequest($picUrl, 'GET', [], [] , $filePath);
+            $response = $this->sendRequest($picUrl, 'GET', null, null , $filePath);
             if($response['statusCode'] == Response::HTTP_OK){
                 return [true,$pathToSave];
             }
