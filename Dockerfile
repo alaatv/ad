@@ -114,6 +114,6 @@ ADD ./start.sh /start.sh
 EXPOSE 80
 
 # Set supervisor to manage container processes
-#ENTRYPOINT ["/usr/bin/supervisord"]
+ENTRYPOINT ["/usr/bin/supervisord"]
 
-CMD ["/start.sh"]
+#CMD ["/start.sh"]
