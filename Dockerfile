@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM debian:buster
 MAINTAINER Alaa <foratmail@gmail.com>
 
 # Let the container know that there is no tty
@@ -59,7 +59,6 @@ RUN buildDeps='curl gcc make autoconf libc-dev zlib1g-dev pkg-config' \
             php7.3-intl \
             php7.3-xml \
             php-pear \
-            php7.3-mcrypt  \
     && pecl -d php_suffix=7.3 install -o -f redis memcached imagick \
     && mkdir -p /run/php \
     && pip install wheel \
@@ -90,10 +89,10 @@ RUN buildDeps='curl gcc make autoconf libc-dev zlib1g-dev pkg-config' \
     && ln -sf /etc/php/7.3/mods-available/imagick.ini /etc/php/7.3/fpm/conf.d/20-imagick.ini \
     && ln -sf /etc/php/7.3/mods-available/imagick.ini /etc/php/7.3/cli/conf.d/20-imagick.ini
 
-RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
-  && curl -o /tmp/composer-setup.sig https://composer.github.io/installer.sig \
-  && php -r "if (hash('SHA384', file_get_contents('/tmp/compser-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
-  && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --version=${COMPOSER_VERSION} && rm -rf /tmp/composer-setup.php
+#------------- Composer & laravel configuration ----------------------------------------------------
+
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Clean up
 RUN rm -rf /tmp/pear \
@@ -115,6 +114,6 @@ ADD ./start.sh /start.sh
 EXPOSE 80
 
 # Set supervisor to manage container processes
-ENTRYPOINT ["/usr/bin/supervisord"]
+#ENTRYPOINT ["/usr/bin/supervisord"]
 
 CMD ["/start.sh"]
