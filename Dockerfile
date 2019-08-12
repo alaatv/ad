@@ -12,7 +12,7 @@ ENV COMPOSER_VERSION 1.9.0
 RUN buildDeps='curl gcc make autoconf libc-dev zlib1g-dev pkg-config' \
     && set -x \
     && apt-get update \
-    && apt-get install --no-install-recommends $buildDeps --no-install-suggests -q -y gnupg2 dirmngr wget apt-transport-https lsb-release ca-certificates \
+    && apt-get install --no-install-recommends $buildDeps --no-install-suggests -q -y gnupg2 dirmngr wget apt-transport-https lsb-release ca-certificates supervisor \
     && \
     NGINX_GPGKEY=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62; \
 	  found=''; \
@@ -108,12 +108,25 @@ ADD ./nginx.conf /etc/nginx/conf.d/default.conf
 # Override default nginx welcome page
 COPY src /usr/share/nginx/src
 
+WORKDIR /usr/share/nginx/src
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+RUN mkdir -p bootstrap/cache \
+  && chgrp -R www-data bootstrap/cache \
+  && chmod -R ug+rwx bootstrap/cache \
+  && composer install \
+    --no-dev \
+    --no-interaction \
+    --prefer-dist \
+    --optimize-autoloader \
+    --ansi \
+    --no-scripts
+
 # Add Scripts
 ADD ./start.sh /start.sh
+RUN chmod +x /start.sh
 
 EXPOSE 80
 
-# Set supervisor to manage container processes
-ENTRYPOINT ["/usr/bin/supervisord"]
-
-#CMD ["/start.sh"]
+CMD ["/start.sh"]
