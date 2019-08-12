@@ -6,6 +6,7 @@
     "type": "project",
     "require": {
         "php": ">=7.3",
+        "guzzlehttp/guzzle": "^6.3",
         "illuminate/redis": "^5.8",
         "laravel/lumen-framework": "5.8.*",
         "league/flysystem-sftp": "^1.0",
