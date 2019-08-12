@@ -94,6 +94,8 @@ RUN buildDeps='curl gcc make autoconf libc-dev zlib1g-dev pkg-config' \
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+RUN mkdir /etc/ssl
+
 # Clean up
 RUN rm -rf /tmp/pear \
     && apt-get purge -y --auto-remove $buildDeps \
@@ -107,6 +109,8 @@ ADD ./nginx.conf /etc/nginx/conf.d/default.conf
 
 # Override default nginx welcome page
 COPY src /usr/share/nginx/src
+
+COPY ssl /etc/ssl
 
 WORKDIR /usr/share/nginx/src
 
@@ -127,6 +131,6 @@ RUN mkdir -p bootstrap/cache \
 ADD ./start.sh /start.sh
 RUN chmod +x /start.sh
 
-EXPOSE 80
+EXPOSE 80 443
 
 CMD ["/start.sh"]
