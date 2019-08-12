@@ -19,9 +19,61 @@ storage/
 vendor/
 .phpunit.result.cache
 app/Services/
-mix-manifest.json
-public/mix-manifest.json
 public/phpinfo.php
 public/test.php
-public/js/adEngine.js
-public/css/adEngine.css
+
+src/vendor
+src/.idea
+src/Homestead.json
+src/Homestead.yaml
+src/.env
+src/node_modules
+src/public/storage
+src/storage/*.key
+src/.vscode
+src/.vagrant
+src/npm-debug.log
+src/yarn-error.log
+src/horizon.log
+src/worker.log
+# Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
+src/.rocketeer/
+src/storage
+src/storage/
+src/vendor/
+src/.phpunit.result.cache
+src/app/Services/
+src/public/phpinfo.php
+src/public/test.php
+
+
+# Tmp files to always-ignore extensions
+*.diff
+*.err
+*.rej
+*.swo
+*~
+*.sass-cache
+*.orig
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+*.sublime-project
+*.sublime-workspace
+/.redcar
+/nbproject
+/.project
+/.idea
+/.eclipse
+*.vi
+
+# logs files
+*.log
