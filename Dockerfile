@@ -108,7 +108,7 @@ ADD ./nginx.conf /etc/nginx/conf.d/default.conf
 # Override default nginx welcome page
 COPY src /usr/share/nginx/src
 
-COPY ssl /etc/alaatvSSL
+#COPY ssl /etc/alaatvSSL
 
 WORKDIR /usr/share/nginx/src
 
@@ -129,6 +129,6 @@ RUN mkdir -p bootstrap/cache \
 ADD ./start.sh /start.sh
 RUN chmod +x /start.sh
 
-EXPOSE 80 443
+EXPOSE 80
 
 CMD ["/start.sh"]
