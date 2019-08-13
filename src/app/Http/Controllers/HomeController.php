@@ -27,13 +27,13 @@ class HomeController extends Controller
 
         $response = $this->sendRequest($picUrl, 'GET', null, null , $filePath);
 
+        dump($pathToSave , $filePath , $response);
         if($response['statusCode'] == Response::HTTP_OK){
             $transfere = new AdPicTransferrer();
             $transferResult = $transfere->transferAdPicToCDN($pathToSave);
-            dd($transferResult);
-        }else{
-            return $response;
+            dump($transferResult);
         }
+        dd('DONE');
     }
 
     /**
