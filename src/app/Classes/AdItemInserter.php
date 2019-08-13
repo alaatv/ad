@@ -7,7 +7,6 @@ namespace App\Classes;
 use App\Repositories\Repo;
 use App\Traits\adTrait;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use stdClass;
 
@@ -23,7 +22,6 @@ class AdItemInserter
      */
     public function storeOrUpdateItem(stdClass $source, $item , AdPicTransferrer $adPicTransferrer): bool
     {
-        Log::info('item valid:'.$this->isValidItem($item));
         if(!$this->isValidItem($item)){
             return false;
         }
@@ -103,7 +101,6 @@ class AdItemInserter
     {
         $isPicTransferred = false;
         $picUrl=null;
-        Log::info('in putAdPicToCDN');
         [$storeResult, $picPath] = $adPicTransferrer->storeAdPic(optional($item)->image);
         if ($storeResult) {
             [$isPicTransferred, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
