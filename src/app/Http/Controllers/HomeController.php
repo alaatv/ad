@@ -23,11 +23,14 @@ class HomeController extends Controller
 
         $basePath = explode('app/', __DIR__)[0];
         $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename($picUrl);
+        dump($pathToSave);
+
         $filePath = fopen($pathToSave, 'w');
+        dump($filePath);
 
         $response = $this->sendRequest($picUrl, 'GET', null, null , $filePath);
 
-        dump($pathToSave , $filePath , $response);
+        dump($response);
         if($response['statusCode'] == Response::HTTP_OK){
             $transfere = new AdPicTransferrer();
             $transferResult = $transfere->transferAdPicToCDN($pathToSave);
