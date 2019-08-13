@@ -24,7 +24,7 @@ class HomeController extends Controller
 
     public function debug(Request $request){
         $basePath = explode('app/', __DIR__)[0];
-        $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename('003.jpg');
+        $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename($request->input('file'));
         dump($basePath , $pathToSave);
         $transfere = new AdPicTransferrer();
         $transferResult = $transfere->transferAdPicToCDN($pathToSave);
