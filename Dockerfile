@@ -114,6 +114,10 @@ WORKDIR /usr/share/nginx/src
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+RUN mkdir -p storage/app/public/images/ads \
+  && chgrp -R www-data storage \
+  && chmod -R ug+rwx storage
+
 RUN mkdir -p bootstrap/cache \
   && chgrp -R www-data bootstrap/cache \
   && chmod -R ug+rwx bootstrap/cache \
