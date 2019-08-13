@@ -13,7 +13,7 @@
 <div class="AlaaAdDom" alaa-ad-size="size-width-full" alaa-ad-source="chibekhoonam"></div>
 <script type="text/javascript">
     (function (w, d, i) {
-        var fp = 'http://192.168.5.34:8000/js/engine.js',
+        var fp = 'https://ads-lumen-backend.liara.run/js/engine.js',
             l = 'AlaaAdEngine',
             s = 'script',
             da = new Date(),
