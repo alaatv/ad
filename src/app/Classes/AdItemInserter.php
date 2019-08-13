@@ -23,7 +23,6 @@ class AdItemInserter
      */
     public function storeOrUpdateItem(stdClass $source, $item , AdPicTransferrer $adPicTransferrer): bool
     {
-        Log::info($this->isValidItem($item));
         if(!$this->isValidItem($item)){
             return false;
         }

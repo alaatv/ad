@@ -65,7 +65,6 @@ class FetchAd extends Job
         $failedPages = 0;
         $donePages = 0;
 
-        Log::info('begining fetch');
         do {
             $counter = 0;
             [$fetchDone , $items , $currentPage , $nextPageUrl , $lastPage, $resultText] = $this->adFetcher->fetchAd($fetchUrl);
