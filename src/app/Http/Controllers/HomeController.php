@@ -20,22 +20,13 @@ class HomeController extends Controller
 
     public function debug(Request $request){
         $picUrl = 'https://media.chibekhoonam.net/2019/07/pasokh-riazi-tajrobi-jaame-test-kheili-sabz-j2.jpg';
-
-        $basePath = explode('app/', __DIR__)[0];
-        $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename($picUrl);
-        dump($pathToSave);
-
-        $filePath = fopen($pathToSave, 'w');
-        dump($filePath);
-
-        $response = $this->sendRequest($picUrl, 'GET', null, null , $filePath);
-
-        dump($response);
-        if($response['statusCode'] == Response::HTTP_OK){
-            $transfere = new AdPicTransferrer();
-            $transferResult = $transfere->transferAdPicToCDN($pathToSave);
-            dump($transferResult);
+        $adPicTransferrer = new AdPicTransferrer();
+        $isPicTransferred = false;
+        [$storeResult, $picPath] = $adPicTransferrer->storeAdPic($picUrl);
+        if ($storeResult) {
+            [$isPicTransferred, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
         }
+        dump($storeResult , $isPicTransferred);
         dd('DONE');
     }
 
