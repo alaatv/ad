@@ -21,8 +21,6 @@ class AdPicTransferrer
      */
     public function storeAdPic(string $picUrl=null): array
     {
-        $issetPicUrl = isset($picUrl);
-        Log::info('isset pic url:'.$issetPicUrl);
         try{
             if(!isset($picUrl))
                 return [false, null];
