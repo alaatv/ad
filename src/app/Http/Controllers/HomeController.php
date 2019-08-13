@@ -10,7 +10,7 @@ use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
 use App\Traits\adTrait;
 use App\Traits\HTTPRequestTrait;
-use Illuminate\{Http\JsonResponse, Http\Request, Http\Response, Support\Facades\DB, Support\Facades\Log};
+use Illuminate\{Http\JsonResponse, Http\Request, Http\Response, Support\Facades\DB};
 use \App\Classes\Response as myResponse ;
 
 class HomeController extends Controller

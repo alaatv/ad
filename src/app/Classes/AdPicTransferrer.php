@@ -52,8 +52,7 @@ class AdPicTransferrer
         if ($disk->put($fileName, File::get($filePath))) {
             $url = config('download_server.IMAGES_PARTIAL_PATH'). '/'.$fileName;
             $done = true;
-            //ToDo : Uncomment
-//            Storage::disk('adImage')->delete($fileName);
+            Storage::disk('adImage')->delete($fileName);
         }
         return [$done, $url];
     }
