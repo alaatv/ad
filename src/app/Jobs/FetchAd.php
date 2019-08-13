@@ -8,7 +8,6 @@ use App\Classes\AdItemInserter;
 use App\Classes\AdPicTransferrer;
 use App\Repositories\Repo;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use stdClass;
 
 class FetchAd extends Job
@@ -65,7 +64,6 @@ class FetchAd extends Job
         $failedPages = 0;
         $donePages = 0;
 
-        Log::info('Begin fetch');
         do {
             $counter = 0;
             [$fetchDone , $items , $currentPage , $nextPageUrl , $lastPage, $resultText] = $this->adFetcher->fetchAd($fetchUrl);
