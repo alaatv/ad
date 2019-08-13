@@ -10,11 +10,7 @@ use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
 use App\Traits\adTrait;
 use App\Traits\HTTPRequestTrait;
-use Illuminate\{
-    Http\JsonResponse,
-    Http\Request,
-    Http\Response,
-    Support\Facades\DB};
+use Illuminate\{Http\JsonResponse, Http\Request, Http\Response, Support\Facades\DB, Support\Facades\Log};
 use \App\Classes\Response as myResponse ;
 
 class HomeController extends Controller
@@ -23,12 +19,21 @@ class HomeController extends Controller
     use adTrait;
 
     public function debug(Request $request){
+        $picUrl = 'https://media.chibekhoonam.net/2019/07/pasokh-riazi-tajrobi-jaame-test-kheili-sabz-j2.jpg';
+
         $basePath = explode('app/', __DIR__)[0];
-        $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename($request->input('file'));
-        dump($basePath , $pathToSave);
-        $transfere = new AdPicTransferrer();
-        $transferResult = $transfere->transferAdPicToCDN($pathToSave);
-        dd($transferResult);
+        $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename($picUrl);
+        $filePath = fopen($pathToSave, 'w');
+
+        $response = $this->sendRequest($picUrl, 'GET', null, null , $filePath);
+
+        if($response['statusCode'] == Response::HTTP_OK){
+            $transfere = new AdPicTransferrer();
+            $transferResult = $transfere->transferAdPicToCDN($pathToSave);
+            dd($transferResult);
+        }else{
+            return $response;
+        }
     }
 
     /**
