@@ -7,6 +7,7 @@ namespace App\Classes;
 use App\Repositories\Repo;
 use App\Traits\adTrait;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use stdClass;
 
@@ -22,6 +23,7 @@ class AdItemInserter
      */
     public function storeOrUpdateItem(stdClass $source, $item , AdPicTransferrer $adPicTransferrer): bool
     {
+        Log::info($this->isValidItem($item));
         if(!$this->isValidItem($item)){
             return false;
         }

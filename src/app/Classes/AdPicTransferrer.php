@@ -22,6 +22,7 @@ class AdPicTransferrer
     public function storeAdPic(string $picUrl=null): array
     {
         try{
+            Log::info('pic url:'. $picUrl);
             if(!isset($picUrl))
                 return [false, null];
 
@@ -31,6 +32,7 @@ class AdPicTransferrer
             $filePath = fopen($pathToSave, 'w');
 
             $response = $this->sendRequest($picUrl, 'GET', null, null , $filePath);
+            Log::info('path to save:'.$pathToSave);
             if($response['statusCode'] == Response::HTTP_OK){
                 return [true,$pathToSave];
             }
