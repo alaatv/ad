@@ -8,8 +8,8 @@ use App\Classes\AdItemInserter;
 use App\Classes\AdPicTransferrer;
 use App\Repositories\Repo;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use stdClass;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 class FetchAd extends Job
 {
@@ -88,17 +88,6 @@ class FetchAd extends Job
     }
 
     /**
-     * @param array $texts
-     */
-    private function printInfo(array $texts):void
-    {
-        foreach ($texts as $text) {
-            $this->info($text);
-            $this->info("\n");
-        }
-    }
-
-    /**
      * @param stdClass $source
      * @param $currentPage
      * @param $lastPage
@@ -152,14 +141,12 @@ class FetchAd extends Job
     /**
      * @param stdClass $source
      * @param array $items
-     * @param ProgressBar $bar
      * @param int $counter
      */
     private function storeItems(stdClass $source, array $items, int $counter): void
     {
         foreach ($items as $key => $item) {
             if ($this->adItemInserter->storeOrUpdateItem($source, $item, $this->adPicTransferrer)) {
-//                $bar->advance();
                 $counter++;
             }
         }
