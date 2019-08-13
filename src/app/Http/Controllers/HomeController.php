@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Ad;
 use App\Classes\AdCollector;
+use App\Classes\AdPicTransferrer;
 use App\Classes\AdRedirectUrlGenerator;
 use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
@@ -22,7 +23,12 @@ class HomeController extends Controller
     use adTrait;
 
     public function debug(Request $request){
-
+        $basePath = explode('app/', __DIR__)[0];
+        $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename('003.jpg');
+        dump($basePath , $pathToSave);
+        $transfere = new AdPicTransferrer();
+        $transferResult = $transfere->transferAdPicToCDN($pathToSave);
+        dd($transferResult);
     }
 
     /**

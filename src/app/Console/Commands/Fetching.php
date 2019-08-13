@@ -12,7 +12,7 @@ class Fetching extends Command
      *
      * @var string
      */
-    protected $signature = 'adengine:fetching {source : name of the source to be fetched}';
+    protected $signature = 'ad:fetch {source : name of the source to be fetched}';
 
     /**
      * The console command description.
