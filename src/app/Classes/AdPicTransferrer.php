@@ -37,9 +37,6 @@ class AdPicTransferrer
             return [false, null];
 
         } catch ( Exception $e ) {
-            Log::error('storeAdPic Exception:');
-            Log::error($e->getLine());
-            Log::error($e->getFile());
             return [false, null];
         }
     }
