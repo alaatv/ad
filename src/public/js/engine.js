@@ -1,7 +1,7 @@
 class Ajax {
 
     constructor(adDomClass, adDomData) {
-        this.url = 'http://192.168.5.34:8000';
+        this.url = 'https://ads-lumen-backend.liara.run';
         // Create a new XMLHttpRequest object
         this.xhr = new XMLHttpRequest();
         this.configureXMLHttpRequest(adDomClass, adDomData);
@@ -173,4 +173,4 @@ let AlaaAds = function () {
 }();
 
 AlaaAds.load();
-AlaaAds.loadFile('http://192.168.5.34:8000/css/engine.css', 'css');
+AlaaAds.loadFile('https://ads-lumen-backend.liara.run/css/engine.css', 'css');
