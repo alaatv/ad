@@ -24,9 +24,7 @@ class AdPicTransferrer
             if(!isset($picUrl))
                 return [false, null];
 
-            $basePath = explode('app/', __DIR__)[0];
-            //ToDo: Hard Code
-            $pathToSave = $basePath . 'storage/app/public/images/ads/' . basename($picUrl);
+            $pathToSave = Storage::disk('adImage')->getAdapter()->getPathPrefix() . basename($picUrl);
             $filePath = fopen($pathToSave, 'w');
 
             $response = $this->sendRequest($picUrl, 'GET', null, null , $filePath);

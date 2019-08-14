@@ -10,7 +10,7 @@ use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
 use App\Traits\adTrait;
 use App\Traits\HTTPRequestTrait;
-use Illuminate\{Http\JsonResponse, Http\Request, Http\Response, Support\Facades\DB};
+use Illuminate\{Http\JsonResponse, Http\Request, Http\Response, Support\Facades\DB, Support\Facades\Storage};
 use \App\Classes\Response as myResponse ;
 
 class HomeController extends Controller
@@ -19,15 +19,7 @@ class HomeController extends Controller
     use adTrait;
 
     public function debug(Request $request){
-        $picUrl = 'https://media.chibekhoonam.net/2019/07/pasokh-riazi-tajrobi-jaame-test-kheili-sabz-j2.jpg';
-        $adPicTransferrer = new AdPicTransferrer();
-        $isPicTransferred = false;
-        [$storeResult, $picPath] = $adPicTransferrer->storeAdPic($picUrl);
-        if ($storeResult) {
-            [$isPicTransferred, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
-        }
-        dump($storeResult , $isPicTransferred);
-        dd('DONE');
+
     }
 
     /**
