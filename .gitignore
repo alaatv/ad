@@ -46,8 +46,8 @@ src/.phpunit.result.cache
 src/app/Services/
 src/public/phpinfo.php
 src/public/test.php
-src/public/js/engine.js
-src/public/js/engine.css
+#src/public/js/engine.js
+#src/public/js/engine.css
 
 
 # Tmp files to always-ignore extensions
