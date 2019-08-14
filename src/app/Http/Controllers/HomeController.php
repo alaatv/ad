@@ -35,7 +35,7 @@ class HomeController extends Controller
      * @param AdCollector $adResponseGenerator
      * @return JsonResponse
      */
-    public function index(Request $request , AdCollector $adResponseGenerator){
+    public function getAd(Request $request , AdCollector $adResponseGenerator){
         $numberOfAds    = $request->input('numberOfAds' , 6);
         $customerUUID   = $request->input('UUID');
         $sourceNames    = $request->input('source' , []);
