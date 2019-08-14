@@ -14,34 +14,13 @@ class AdFetcher
 {
     use HTTPRequestTrait;
 
-    const FIRST_FETCH_DATE = '2016-03-01';
-
     /**
      * @param string $fetchUrl
      * @return array
      */
     public function fetchAd(string $fetchUrl): array
     {
-        $response = $this->sendRequest($fetchUrl, 'POST');
-        return $this->getRequestResult($response);
-    }
-
-    /**
-     * @param stdClass $source
-     * @return string
-     */
-    public function getFetchUrl(stdClass $source):string
-    {
-        $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $source->id])->orderByDesc('created_at')->first();
-        if (is_null($lastFetch)) {
-            return $source->fetch_url.'&timestamp='.Carbon::parse(self::FIRST_FETCH_DATE)->timestamp;
-        }
-
-        if ($lastFetch->current_page < $lastFetch->last_page) {
-            return  $lastFetch->next_page_url;
-        }
-
-        return $source->fetch_url . '&timestamp=' . Carbon::parse($lastFetch->updated_at)->timestamp;
+        return $this->getRequestResult($this->sendRequest($fetchUrl, 'POST'));
     }
 
     /**

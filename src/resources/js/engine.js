@@ -59,11 +59,11 @@ class Ajax {
 
 let AlaaAds = function () {
 
-    let attr_showFromOthers = 'sfo';
-
-    function buildAllDoms() {
-        let x = document.getElementsByClassName('AlaaAdDom');
-        let i;
+    function buildAllDoms(init, ClassName) {
+        if (typeof ClassName === 'undefined') {
+            ClassName = 'AlaaAdDom';
+        }
+        let x = document.getElementsByClassName(ClassName);
         let domLength = x.length;
         for (let i = 0; i < domLength; i++) {
             let dom = x[i],
@@ -86,8 +86,14 @@ let AlaaAds = function () {
 
             adDomData = Object.assign(adDomData, domAttrData);
 
-            let ajaxload = new Ajax(adDomClass, adDomData);
-            ajaxload.sendXMLHttpRequest();
+            console.log(domAttrData.autoinit);
+            if (
+                (init === true && (typeof domAttrData.autoinit === 'undefined' || domAttrData.autoinit == 1)) ||
+                (init === false && typeof domAttrData.autoinit !== 'undefined' && domAttrData.autoinit == 0)
+            ) {
+                let ajaxload = new Ajax(adDomClass, adDomData);
+                ajaxload.sendXMLHttpRequest();
+            }
         }
     }
 
@@ -123,6 +129,8 @@ let AlaaAds = function () {
         let blockSize = '';
         if (typeof adDomData.size !== 'undefined') {
             blockSize = adDomData.size;
+        } else {
+            blockSize = 'size-width-full';
         }
         return '' +
             '            <div class="adsAlaatvRecomenderBlock-item '+blockSize+'">\n' +
@@ -159,8 +167,11 @@ let AlaaAds = function () {
     }
 
     return {
-        load: function () {
-            buildAllDoms();
+        init: function () {
+            buildAllDoms(true);
+        },
+        load: function (ClassName) {
+            buildAllDoms(false, ClassName);
         },
         loadAdDom: function (adDomClass, adDomData, data) {
             let adDom = document.getElementsByClassName(adDomClass)[0];
@@ -172,5 +183,5 @@ let AlaaAds = function () {
     };
 }();
 
-AlaaAds.load();
+AlaaAds.init();
 AlaaAds.loadFile('https://ads.alaatv.com/css/engine.css', 'css');
