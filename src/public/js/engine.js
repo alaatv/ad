@@ -1,7 +1,7 @@
 class Ajax {
 
     constructor(adDomClass, adDomData) {
-        this.url = 'https://ads.alaatv.com';
+        this.url = 'https://ads.alaatv.com/getAd';
         // Create a new XMLHttpRequest object
         this.xhr = new XMLHttpRequest();
         this.configureXMLHttpRequest(adDomClass, adDomData);
