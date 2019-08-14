@@ -6,6 +6,7 @@ namespace App\Jobs;
 use App\Classes\AdFetcher;
 use App\Classes\AdItemInserter;
 use App\Classes\AdPicTransferrer;
+use App\Classes\SourceFetchUrlGenerator;
 use App\Repositories\Repo;
 use Carbon\Carbon;
 use stdClass;
@@ -35,7 +36,6 @@ class FetchAd extends Job
      * @param AdFetcher $adFetcher
      * @param AdItemInserter $adItemInserter
      * @param AdPicTransferrer $adPicTransferrer
-     * @param string $sourceName
      */
     public function handle(AdFetcher $adFetcher , AdItemInserter $adItemInserter , AdPicTransferrer $adPicTransferrer)
     {
@@ -56,7 +56,8 @@ class FetchAd extends Job
      */
     private function fetch(stdClass $source): array
     {
-        $fetchUrl = $this->adFetcher->getFetchUrl($source);
+        $fetchUrl = (new SourceFetchUrlGenerator($source))->generateUrl();
+
         if(is_null($fetchUrl)) {
             return [0, 0];
         }
