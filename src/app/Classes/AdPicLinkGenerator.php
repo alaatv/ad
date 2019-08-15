@@ -10,10 +10,10 @@ use stdClass;
 
 class AdPicLinkGenerator
 {
-    protected  $ad;
+    private $ad;
 
     /**
-     * adLinkGenerator constructor.
+     * AdPicLinkGenerator constructor.
      * @param stdClass $ad
      */
     public function __construct(stdClass $ad)
@@ -21,10 +21,9 @@ class AdPicLinkGenerator
         $this->ad = $ad;
     }
 
-    public function generatePicLink()
-    {
+    public function generatePicLink() :string {
         /** @var AlaaSftpAdapter $diskAdapter */
         $diskAdapter = Storage::disk('alaaCdnSFTP')->getAdapter();
-        $this->ad->image = $diskAdapter->getUrl(optional($this->ad)->image);
+        return $diskAdapter->getUrl(optional($this->ad)->image);
     }
 }
