@@ -136,7 +136,7 @@ let AlaaAds = function () {
             '            <div class="adsAlaatvRecomenderBlock-item '+blockSize+'">\n' +
             '                <div class="item-pic">\n' +
             '                    <a href="'+data.link+'">\n' +
-            '                        <img src="'+data.image+'"  alt="'+data.name+'">\n' +
+            '                        <img src="'+data.image.url+'" alt="'+data.name+'" width="'+data.image.width+'" height="'+data.image.height+'">\n' +
             '                    </a>\n' +
             '                </div>\n' +
             '                <div class="item-name">\n' +
