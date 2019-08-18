@@ -29,18 +29,19 @@ class SourceFetchUrlGenerator
     {
         $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $this->source->id])->orderByDesc('created_at')->first();
 
-        if(stripos($lastFetch , '?') === false){
-            $lastFetch .= '?';
+        $sourceFetchUrl = $this->source->fetch_url;
+        if(stripos($sourceFetchUrl , '?') === false){
+            $sourceFetchUrl .= '?';
         }
 
         if (is_null($lastFetch)) {
-            return $this->source->fetch_url.'&timestamp='.Carbon::parse(self::FIRST_FETCH_DATE)->timestamp;
+            return $sourceFetchUrl.'&timestamp='.Carbon::parse(self::FIRST_FETCH_DATE)->timestamp;
         }
 
         if ($lastFetch->current_page < $lastFetch->last_page) {
             return  $lastFetch->next_page_url;
         }
 
-        return $this->source->fetch_url . '&timestamp=' . Carbon::parse($lastFetch->updated_at)->timestamp;
+        return $sourceFetchUrl. '&timestamp=' . Carbon::parse($lastFetch->updated_at)->timestamp;
     }
 }
