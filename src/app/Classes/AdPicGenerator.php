@@ -25,7 +25,7 @@ class AdPicGenerator
     private function imageBlockFormatter() : array {
         $adPicDimension = $this->getAdPicDimension();
         return [
-            'image'   => $this->getAdPicLink(),
+            'link'   => $this->getAdPicLink(),
             'width'   => $adPicDimension['width'],
             'height'  => $adPicDimension['height'],
         ];
