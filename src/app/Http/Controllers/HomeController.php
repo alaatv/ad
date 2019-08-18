@@ -41,7 +41,7 @@ class HomeController extends Controller
             $sourceNames = convertTagStringToArray($sourceNames);
         }
 
-        $sources = SourceRepo::getValidSource($customer->id,$sourceNames,$urls)->get();
+        $sources = SourceRepo::getValidSource($customer->id,$sourceNames,[])->get();
         if($sources->isEmpty()){
             return response()->json($this->setErrorResponse(myResponse::NO_VALID_SOURCE_FOUND_FOR_CUSTOMER, 'No valid source found for this customer'));
         }
