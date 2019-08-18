@@ -28,6 +28,11 @@ class SourceFetchUrlGenerator
     public function generateUrl():?string
     {
         $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $this->source->id])->orderByDesc('created_at')->first();
+
+        if(stripos($lastFetch , '?') === false){
+            $lastFetch .= '?';
+        }
+
         if (is_null($lastFetch)) {
             return $this->source->fetch_url.'&timestamp='.Carbon::parse(self::FIRST_FETCH_DATE)->timestamp;
         }
