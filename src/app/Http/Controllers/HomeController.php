@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Ad;
 use App\Classes\AdCollector;
-use App\Classes\AdPicTransferrer;
 use App\Classes\AdRedirectUrlGenerator;
 use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
