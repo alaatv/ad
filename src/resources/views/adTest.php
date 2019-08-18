@@ -25,7 +25,7 @@
         j.async = true;
         j.src = fp + '?uuid=' + i + '&v=' + v;
         f.parentNode.insertBefore(j, f);
-    })(window, document, '35b39d4b-517b-44bc-85c4-44f93242836f');
+    })(window, document, '<?php if(isset($uuid)) echo $uuid; else echo '' ; ?>');
 </script>
 </body>
 </html>

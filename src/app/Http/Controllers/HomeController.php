@@ -95,6 +95,7 @@ class HomeController extends Controller
     }
 
     public function adTest(Request $request){
-        return view('adTest');
+        $uuid = $request->get('uuid' , '35b39d4b-517b-44bc-85c4-44f93242836f');
+        return view('adTest' , compact('uuid'));
     }
 }
