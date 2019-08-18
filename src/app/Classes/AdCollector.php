@@ -17,7 +17,7 @@ class AdCollector
     public function makeAdsArray(Collection $sources, $numberOfAds): array{
         $totalAds = [];
         foreach ($sources as $source) {
-            $ads = Repo::getRecords('ads', ['*'], ['source_id' => $source->id, 'enable' => 1])->orderByRaw('RAND()');
+            $ads = Repo::getRecords('ads', ['*'], ['source_id' => $source->source_id, 'enable' => 1])->orderByRaw('RAND()');
             $ads = $ads->paginate($numberOfAds, ['*'], 'page');
             $this->generateAdLinks($ads);
             $this->generateAdPicLinks($ads);
