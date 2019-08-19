@@ -31,6 +31,9 @@ class Ajax {
             } else { // show the result
                 // alert(`Done, got ${xhr.response.length} bytes`); // responseText is the server
                 AlaaAds.loadAdDom(adDomClass, adDomData, this.response);
+                if (typeof imageObserver !== "undefined") {
+                    imageObserver.observe();
+                }
             }
         };
     }
@@ -86,7 +89,6 @@ let AlaaAds = function () {
 
             adDomData = Object.assign(adDomData, domAttrData);
 
-            console.log(domAttrData.autoinit);
             if (
                 (init === true && (typeof domAttrData.autoinit === 'undefined' || domAttrData.autoinit == 1)) ||
                 (init === false && typeof domAttrData.autoinit !== 'undefined' && domAttrData.autoinit == 0)
@@ -126,17 +128,28 @@ let AlaaAds = function () {
     }
 
     function createItem(data, adDomData) {
-        let blockSize = '';
+        console.log(adDomData);
+        console.log('typeof: ', typeof adDomData.preloadimage !== 'undefined');
+        console.log('adDomData.preloadImage: ', adDomData.preloadimage);
+        let blockSize = '',
+            preloadImage = (typeof adDomData.preloadimage !== 'undefined' && adDomData.preloadimage === "1"),
+            imgHtml = '';
+        console.log(preloadImage);
         if (typeof adDomData.size !== 'undefined') {
             blockSize = adDomData.size;
         } else {
             blockSize = 'size-width-full';
         }
+        if (preloadImage) {
+            imgHtml = '                        <img src="https://cdn.alaatv.com/loder.jpg?w=1&h=1" data-src="'+data.image.url+'" class="lazy-image" alt="'+data.name+'" width="'+data.image.width+'" height="'+data.image.height+'">\n';
+        } else {
+            imgHtml = '                        <img src="'+data.image.url+'" alt="'+data.name+'" width="'+data.image.width+'" height="'+data.image.height+'">\n';
+        }
         return '' +
             '            <div class="adsAlaatvRecomenderBlock-item '+blockSize+'">\n' +
             '                <div class="item-pic">\n' +
             '                    <a href="'+data.link+'">\n' +
-            '                        <img src="'+data.image.url+'" alt="'+data.name+'" width="'+data.image.width+'" height="'+data.image.height+'">\n' +
+            imgHtml +
             '                    </a>\n' +
             '                </div>\n' +
             '                <div class="item-name">\n' +
