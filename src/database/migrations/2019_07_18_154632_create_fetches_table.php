@@ -19,7 +19,7 @@ class CreateFetchesTable extends Migration
             $table->unsignedInteger('source_id')->nullable()->comment('آی دی منبع فچ');
             $table->integer('current_page')->nullable()->comment('شماره صفحه ای که فچ شده');
             $table->integer('last_page')->nullable()->comment('شماره آخرین صفحه');
-            $table->string('next_page_url')->nullable()->comment('آدرس صفحه بعدی');
+            $table->text('next_page_url')->nullable()->comment('آدرس صفحه بعدی');
             $table->timestamps();
             $table->softDeletes();
 
