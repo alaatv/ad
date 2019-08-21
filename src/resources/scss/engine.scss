@@ -157,9 +157,12 @@
 
             .item-pic {
                 padding: 0 5px;
-                img {
-                    max-width: 100%;
-                    min-width: 100%;
+                a {
+                    display: block;
+                    img {
+                        max-width: 100%;
+                        min-width: 100%;
+                    }
                 }
             }
             .item-name {
