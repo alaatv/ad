@@ -3,8 +3,6 @@
 
 namespace App\Classes\GoogleAnalytics\AnalyticsUTM;
 
-use App\Repositories\Repo;
-
 class UTMContent extends AnalyticsUTMGenerator
 {
     public function generateUTM()
