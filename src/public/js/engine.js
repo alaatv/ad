@@ -128,13 +128,13 @@ let AlaaAds = function () {
     }
 
     function createItem(data, adDomData) {
-        console.log(adDomData);
-        console.log('typeof: ', typeof adDomData.preloadimage !== 'undefined');
-        console.log('adDomData.preloadImage: ', adDomData.preloadimage);
+        // console.log(adDomData);
+        // console.log('typeof: ', typeof adDomData.preloadimage !== 'undefined');
+        // console.log('adDomData.preloadImage: ', adDomData.preloadimage);
         let blockSize = '',
             preloadImage = (typeof adDomData.preloadimage !== 'undefined' && adDomData.preloadimage === "1"),
             imgHtml = '';
-        console.log(preloadImage);
+        // console.log(preloadImage);
         if (typeof adDomData.size !== 'undefined') {
             blockSize = adDomData.size;
         } else {
