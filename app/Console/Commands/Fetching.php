@@ -26,9 +26,10 @@ class Fetching extends Command
      * Execute the console command.
      *
      */
-    public function handle():void
+    public function handle(): int
     {
         $sourceName = $this->argument('source');
         dispatch(new FetchAd($sourceName));
+        return 0;
     }
 }

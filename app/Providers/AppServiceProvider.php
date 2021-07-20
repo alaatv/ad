@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Adapter\AlaaSftpAdapter;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Filesystem;
@@ -20,5 +21,15 @@ class AppServiceProvider extends ServiceProvider
             return new Filesystem(new AlaaSftpAdapter($config));
         });
 
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        Paginator::useBootstrap();
     }
 }

@@ -1,4 +1,3 @@
-ssl/
 /vendor
 /.idea
 Homestead.json
@@ -22,34 +21,7 @@ vendor/
 app/Services/
 public/phpinfo.php
 public/test.php
-
-src/vendor
-src/.idea
-src/Homestead.json
-src/Homestead.yaml
-src/.env
-src/node_modules
-src/public/storage
-src/storage/*.key
-src/.vscode
-src/.vagrant
-src/npm-debug.log
-src/yarn-error.log
-src/horizon.log
-src/worker.log
-# Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
-src/.rocketeer/
-src/storage
-src/storage/
-src/vendor/
-src/.phpunit.result.cache
-src/app/Services/
-src/public/phpinfo.php
-src/public/test.php
-#src/public/js/engine.js
-#src/public/js/engine.css
-
-
+public/storage
 # Tmp files to always-ignore extensions
 *.diff
 *.err
@@ -58,11 +30,6 @@ src/public/test.php
 *~
 *.sass-cache
 *.orig
-
-# OS
-.DS_Store
-Thumbs.db
-
 # Editors
 .cache
 .project
@@ -74,7 +41,6 @@ Thumbs.db
 /.redcar
 /nbproject
 /.project
-/.idea
 /.eclipse
 *.vi
 
