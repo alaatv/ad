@@ -12,14 +12,14 @@ class Fetching extends Command
      *
      * @var string
      */
-    protected string $signature = 'ad:fetch {source : name of the source to be fetched}';
+    protected $signature = 'ad:fetch {source : name of the source to be fetched}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected string $description = 'Fetiching ads from a source';
+    protected $description = 'Fetiching ads from a source';
 
 
     /**
