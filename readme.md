@@ -1,4 +1,0 @@
-# adEngine
-
-
-ads.alaatv.com
