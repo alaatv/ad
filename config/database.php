@@ -132,23 +132,7 @@ return [
             'host'         => env('REDIS_HOST', 'localhost'),
             'password'     => env('REDIS_PASSWORD', null),
             'port'         => env('REDIS_PORT', 6379),
-            'database'     => 0,
-            'read_timeout' => 60,
-        ],
-
-        'redisDB' => [
-            'host'         => env('REDIS_HOST', 'localhost'),
-            'password'     => env('REDIS_PASSWORD', null),
-            'port'         => env('REDIS_PORT', 6379),
-            'database'     => 1,
-            'read_timeout' => 60,
-        ],
-
-        'horizon' => [
-            'host'         => env('REDIS_HOST', 'localhost'),
-            'password'     => env('REDIS_PASSWORD', null),
-            'port'         => env('REDIS_PORT', 6379),
-            'database'     => 2,
+            'database'     => 13,
             'read_timeout' => 60,
         ],
 
@@ -156,14 +140,15 @@ return [
             'host'         => env('REDIS_HOST', 'localhost'),
             'password'     => env('REDIS_PASSWORD', null),
             'port'         => env('REDIS_PORT', 6379),
-            'database'     => 3,
+            'database'     => 14,
             'read_timeout' => 60,
         ],
+
         'session' => [
             'host'         => env('REDIS_HOST', 'localhost'),
             'password'     => env('REDIS_PASSWORD', null),
             'port'         => env('REDIS_PORT', 6379),
-            'database'     => 4,
+            'database'     => 15,
             'read_timeout' => 60,
         ],
 
