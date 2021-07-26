@@ -29,10 +29,8 @@ use App\Http\Controllers\HomeController;
 //});
 
 //$router->get('/', [HomeController::class , 'index']);  Not working in lumen
-Route::group(['namespace' => "App\Http\Controllers"] , function ($router){
-    $router->post('fetchAd', 'HomeController@fetchAds');
-    $router->get('tabligh/{UUID}/click', ['as' => 'ad.click', 'uses' => 'HomeController@adClick']);
-    $router->get('debug', 'HomeController@debug');
-    $router->get('test', 'HomeController@adTest');
-});
 Route::get('getAd',[HomeController::class,'getAd']);
+Route::post('fetchAd',[HomeController::class,'fetchAd']);
+Route::get('tabligh/{UUID}/click',[HomeController::class,'adClick'])->name('ad.click');
+Route::get('debug',[HomeController::class,'debug']);
+Route::get('test',[HomeController::class,'adTest']);
