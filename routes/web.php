@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,8 +29,10 @@ use Illuminate\Support\Str;
 //});
 
 //$router->get('/', [HomeController::class , 'index']);  Not working in lumen
-$router->get('getAd', 'HomeController@getAd');
-$router->post('fetchAd', 'HomeController@fetchAds');
-$router->get('tabligh/{UUID}/click', ['as' => 'ad.click', 'uses' => 'HomeController@adClick']);
-$router->get('debug', 'HomeController@debug');
-$router->get('test', 'HomeController@adTest');
+Route::group(['namespace' => "App\Http\Controllers"] , function ($router){
+    $router->get('getAd', 'HomeController@getAd');
+    $router->post('fetchAd', 'HomeController@fetchAds');
+    $router->get('tabligh/{UUID}/click', ['as' => 'ad.click', 'uses' => 'HomeController@adClick']);
+    $router->get('debug', 'HomeController@debug');
+    $router->get('test', 'HomeController@adTest');
+});
