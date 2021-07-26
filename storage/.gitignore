@@ -1,0 +1,6 @@
+*
+!.gitignore
+!sessions
+!app
+!framework
+!logs
