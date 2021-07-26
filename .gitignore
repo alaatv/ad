@@ -5,7 +5,6 @@ Homestead.yaml
 .env
 /node_modules
 /public/storage
-/storage/*.key
 /.vscode
 /.vagrant
 npm-debug.log
@@ -14,8 +13,6 @@ horizon.log
 worker.log
 # Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
 .rocketeer/
-storage
-storage/
 vendor/
 .phpunit.result.cache
 app/Services/
