@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\HomeController;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -30,9 +30,9 @@ use Illuminate\Support\Facades\Route;
 
 //$router->get('/', [HomeController::class , 'index']);  Not working in lumen
 Route::group(['namespace' => "App\Http\Controllers"] , function ($router){
-    $router->get('getAd', 'HomeController@getAd');
     $router->post('fetchAd', 'HomeController@fetchAds');
     $router->get('tabligh/{UUID}/click', ['as' => 'ad.click', 'uses' => 'HomeController@adClick']);
     $router->get('debug', 'HomeController@debug');
     $router->get('test', 'HomeController@adTest');
 });
+Route::get('getAd',[HomeController::class,'getAd']);
