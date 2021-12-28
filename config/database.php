@@ -132,7 +132,7 @@ return [
             'host'         => env('REDIS_HOST', 'localhost'),
             'password'     => env('REDIS_PASSWORD', null),
             'port'         => env('REDIS_PORT', 6379),
-            'database'     => 13,
+            'database'     => env('REDIS_DEFAULT_DB'),
             'read_timeout' => 60,
         ],
 
@@ -140,7 +140,7 @@ return [
             'host'         => env('REDIS_HOST', 'localhost'),
             'password'     => env('REDIS_PASSWORD', null),
             'port'         => env('REDIS_PORT', 6379),
-            'database'     => 14,
+            'database'     => env('REDIS_QUEUE_DB'),
             'read_timeout' => 60,
         ],
 
@@ -148,7 +148,7 @@ return [
             'host'         => env('REDIS_HOST', 'localhost'),
             'password'     => env('REDIS_PASSWORD', null),
             'port'         => env('REDIS_PORT', 6379),
-            'database'     => 15,
+            'database'     => env('REDIS_SESSION_DB'),
             'read_timeout' => 60,
         ],
 
