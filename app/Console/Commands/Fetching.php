@@ -19,7 +19,7 @@ class Fetching extends Command
      *
      * @var string
      */
-    protected $description = 'Fetiching ads from a source';
+    protected $description = 'Fetching ads from a source';
 
 
     /**

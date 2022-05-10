@@ -37,15 +37,15 @@ class FetchAd extends Job
      * @param AdItemInserter $adItemInserter
      * @param AdPicTransferrer $adPicTransferrer
      */
-    public function handle(AdFetcher $adFetcher , AdItemInserter $adItemInserter , AdPicTransferrer $adPicTransferrer)
+    public function handle(AdFetcher $adFetcher, AdItemInserter $adItemInserter, AdPicTransferrer $adPicTransferrer)
     {
         $this->adFetcher = $adFetcher;
-        $this->adItemInserter=$adItemInserter;
-        $this->adPicTransferrer=$adPicTransferrer;
+        $this->adItemInserter = $adItemInserter;
+        $this->adPicTransferrer = $adPicTransferrer;
 
         /** @var stdClass $source */
-        $source = Repo::getRecords('sources' , ['*'], ['name'=>$this->sourceName])->first();
-        if(isset($source)){
+        $source = Repo::getRecords('sources', ['*'], ['name' => $this->sourceName])->first();
+        if (isset($source)) {
             [$donePages, $failedPages] = $this->fetch($source);
         }
     }
@@ -58,7 +58,7 @@ class FetchAd extends Job
     {
         $fetchUrl = (new SourceFetchUrlGenerator($source))->generateUrl();
 
-        if(is_null($fetchUrl)) {
+        if (is_null($fetchUrl)) {
             return [0, 0];
         }
 
@@ -67,8 +67,8 @@ class FetchAd extends Job
 
         do {
             $counter = 0;
-            [$fetchDone , $items , $currentPage , $nextPageUrl , $lastPage, $resultText] = $this->adFetcher->fetchAd($fetchUrl);
-            if(!$fetchDone){
+            [$fetchDone, $items, $currentPage, $nextPageUrl, $lastPage, $resultText] = $this->adFetcher->fetchAd($fetchUrl);
+            if (!$fetchDone) {
                 $failedPages++;
                 continue;
             }
@@ -82,7 +82,7 @@ class FetchAd extends Job
             $this->insertOrUpdateFetch($source, $currentPage, $lastPage, $nextPageUrl);
             $fetchUrl = $nextPageUrl;
             $donePages++;
-        } while ($currentPage < $lastPage );
+        } while ($currentPage < $lastPage);
 
         return [$donePages, $failedPages];
     }
@@ -110,7 +110,7 @@ class FetchAd extends Job
      * @param string $nextPageUrl
      * @return bool
      */
-    private function insertFetch(int $sourceID, int $currentPage, int $lastPage=null, string $nextPageUrl=null):bool
+    private function insertFetch(int $sourceID, int $currentPage, int $lastPage = null, string $nextPageUrl = null): bool
     {
         return Repo::insertRecord('fetches', [
             'source_id' => $sourceID,
@@ -128,7 +128,7 @@ class FetchAd extends Job
      * @param $nextPageUrl
      * @return bool
      */
-    private function updateFetch(int $sourceID, $currentPage, $nextPageUrl):bool
+    private function updateFetch(int $sourceID, $currentPage, $nextPageUrl): bool
     {
         return Repo::updateRecord('fetches', [
             'source_id' => $sourceID,

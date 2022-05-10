@@ -5,19 +5,20 @@ namespace App\Http\Controllers;
 use App\Ad;
 use App\Classes\AdCollector;
 use App\Classes\AdRedirectUrlGenerator;
+use App\Classes\Response as myResponse;
 use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
 use App\Traits\adTrait;
 use App\Traits\HTTPRequestTrait;
-use Illuminate\{Http\JsonResponse, Http\Request, Http\Response, Support\Facades\DB, Support\Facades\Storage};
-use \App\Classes\Response as myResponse ;
+use Illuminate\{Http\JsonResponse, Http\Request, Http\Response, Support\Facades\DB};
 
 class HomeController extends Controller
 {
     use HTTPRequestTrait;
     use adTrait;
 
-    public function debug(Request $request){
+    public function debug(Request $request)
+    {
 
     }
 
@@ -26,61 +27,64 @@ class HomeController extends Controller
      * @param AdCollector $adResponseGenerator
      * @return JsonResponse
      */
-    public function getAd(Request $request , AdCollector $adResponseGenerator){
-        $numberOfAds    = $request->input('numberOfAds' , 6);
-        $customerUUID   = $request->input('UUID');
-        $sourceNames    = $request->input('source' , []);
-        $urls           = $request->input('urls' , []);
+    public function getAd(Request $request, AdCollector $adResponseGenerator)
+    {
+        $numberOfAds = $request->input('numberOfAds', 6);
+        $customerUUID = $request->input('UUID');
+        $sourceNames = $request->input('source', []);
+        $urls = $request->input('urls', []);
 
-        $customer = Repo::getRecords('users', ['*'], ['UUID'=>$customerUUID])->first();
-        if(is_null($customer)){
+        $customer = Repo::getRecords('users', ['*'], ['UUID' => $customerUUID])->first();
+        if (is_null($customer)) {
             return response()->json($this->setErrorResponse(myResponse::USER_NOT_FOUND, 'User not found'));
         }
 
-        if(is_string($sourceNames)){
+        if (is_string($sourceNames)) {
             $sourceNames = convertTagStringToArray($sourceNames);
         }
 
-        $sources = SourceRepo::getValidSource($customer->id,$sourceNames,[])->get();
-        if($sources->isEmpty()){
+        $sources = SourceRepo::getValidSource($customer->id, $sourceNames, [])->get();
+        if ($sources->isEmpty()) {
             return response()->json($this->setErrorResponse(myResponse::NO_VALID_SOURCE_FOUND_FOR_CUSTOMER, 'No valid source found for this customer'));
         }
 
         $totalAds = $adResponseGenerator->makeAdsArray($sources, $numberOfAds);
-        return response()->json($totalAds,Response::HTTP_OK , [] ,JSON_UNESCAPED_SLASHES);
+        return response()->json($totalAds, Response::HTTP_OK, [], JSON_UNESCAPED_SLASHES);
     }
 
-    public function fetchAd(Request $request){
-        //ToDo : security alert : any one can update Chibekhoonam ads
-        $itemID         = $request->input('item_id');
-        $itemType       = $request->input('item_type');
-        $sourceName     = $request->input('source');
-        $source = Repo::getRecords('sources', ['*'], ['name'=>$sourceName])->first();
-        $ad = Repo::getRecords('ads', ['*'], [$this->makeAdForeignId($source->id , $itemID , $itemType)])->first();
+    public function fetchAd(Request $request)
+    {
+        //ToDo : security alert : anyone can update Chibekhoonam ads
+        $itemID = $request->input('item_id');
+        $itemType = $request->input('item_type');
+        $sourceName = $request->input('source');
+        $source = Repo::getRecords('sources', ['*'], ['name' => $sourceName])->first();
+        $ad = Repo::getRecords('ads', ['*'], [$this->makeAdForeignId($source->id, $itemID, $itemType)])->first();
 
-        if(is_null($ad)){
+        if (is_null($ad)) {
             return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'));
         }
 
         $update = DB::table('ads')->update([
-           'name'   => $request->input('name' , optional($ad)->name),
-           'image'  => $request->input('link' , optional($ad)->link),
-           'link'   => $request->input('image' , optional($ad)->image),
+            'name' => $request->input('name', optional($ad)->name),
+            'image' => $request->input('link', optional($ad)->link),
+            'link' => $request->input('image', optional($ad)->image),
         ]);
 
-        if($update){
+        if ($update) {
             return response()->json([
-                'message'   =>  'ad has been updated successfully'
+                'message' => 'ad has been updated successfully'
             ]);
         }
 
         return response()->json($this->setErrorResponse(myResponse::AD_UPDATE_DATABASE_ERROR, 'Database error on updating ad'));
     }
 
-    public function adClick(Request $request , string $UUID){
-        $ad = Repo::getRecords('ads' , ['*'] , ['UUID'=>$UUID])->first();
+    public function adClick(Request $request, string $UUID)
+    {
+        $ad = Repo::getRecords('ads', ['*'], ['UUID' => $UUID])->first();
         Ad::setReferer($ad, $request->headers->get('referer'));
-        if(is_null($ad)){
+        if (is_null($ad)) {
             return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'));
         }
 
@@ -91,11 +95,12 @@ class HomeController extends Controller
 //            'ev'  =>  300
 //        ])->send();
 
-        return view('redirectForm' , ['redirectUrl'=> ( new AdRedirectUrlGenerator($ad))->generateUrl()]);
+        return view('redirectForm', ['redirectUrl' => (new AdRedirectUrlGenerator($ad))->generateUrl()]);
     }
 
-    public function adTest(Request $request){
-        $uuid = $request->get('uuid' , '35b39d4b-517b-44bc-85c4-44f93242836f');
-        return view('adTest' , compact('uuid'));
+    public function adTest(Request $request)
+    {
+        $uuid = $request->get('uuid', '35b39d4b-517b-44bc-85c4-44f93242836f');
+        return view('adTest', compact('uuid'));
     }
 }
