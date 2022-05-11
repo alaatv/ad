@@ -20,15 +20,19 @@ class FetchAd extends Job
     /** @var AdPicTransferrer $adPicTransferrer */
     private $adPicTransferrer;
     private $sourceName;
+    private $since;
+    private $till;
 
     /**
      * Create a new job instance.
      *
      * @param string $sourceName
      */
-    public function __construct(string $sourceName)
+    public function __construct(string $sourceName, string $since, string $till)
     {
         $this->sourceName = $sourceName;
+        $this->since = $since;
+        $this->till = $till;
     }
 
     /**
@@ -46,7 +50,7 @@ class FetchAd extends Job
         /** @var stdClass $source */
         $source = Repo::getRecords('sources', ['*'], ['name' => $this->sourceName])->first();
         if (isset($source)) {
-            [$donePages, $failedPages] = $this->fetch($source);
+            [$donePages, $failedPages] = $this->fetch($source, $this->since, $this->till);
         }
     }
 
@@ -54,9 +58,9 @@ class FetchAd extends Job
      * @param stdClass $source
      * @return array
      */
-    private function fetch(stdClass $source): array
+    private function fetch(stdClass $source, $since, $till): array
     {
-        $fetchUrl = (new SourceFetchUrlGenerator($source))->generateUrl();
+        $fetchUrl = (new SourceFetchUrlGenerator($source, $since, $till))->generateUrl();
 
         if (is_null($fetchUrl)) {
             return [0, 0];
@@ -135,6 +139,7 @@ class FetchAd extends Job
             'current_page' => $currentPage,
             'next_page_url' => $nextPageUrl,
             'updated_at' => Carbon::now(),
+            'completed_at' => Carbon::now(),
         ]);
     }
 

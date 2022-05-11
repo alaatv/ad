@@ -89,7 +89,7 @@ class AdItemInserter
     private function hasBeenInserted(string $adId):bool
     {
         $ad = Repo::getRecords('ads', ['id'] ,['foreign_id'=>$adId])->first();
-        return (isset($ad))?true:false;
+        return isset($ad);
     }
 
     /**

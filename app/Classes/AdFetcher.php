@@ -4,11 +4,8 @@
 namespace App\Classes;
 
 
-use App\Repositories\Repo;
 use App\Traits\HTTPRequestTrait;
-use Carbon\Carbon;
-use Illuminate\Http\Response;
-use stdClass;
+use Symfony\Component\HttpFoundation\Response;
 
 class AdFetcher
 {
@@ -39,16 +36,16 @@ class AdFetcher
             $resultText = 'Fetched successfully';
         } else {
             $done = false;
-            $resultText = isset($result->error->message) ? $result->error->message : 'No response message received';
+            $resultText = $result->error->message ?? 'No response message received';
         }
 
         return [
-                $done ,
-                (isset($data))?$data:null ,
-                (isset($currentPage))?$currentPage:null ,
-                (isset($nextPageUrl) && strlen($nextPageUrl)>0)?$nextPageUrl:null ,
-                (isset($lastPage))?$lastPage:null ,
-                $resultText,
-            ];
+            $done,
+            (isset($data)) ? $data : null,
+            (isset($currentPage)) ? $currentPage : null,
+            (isset($nextPageUrl) && strlen($nextPageUrl) > 0) ? $nextPageUrl : null,
+            (isset($lastPage)) ? $lastPage : null,
+            $resultText,
+        ];
     }
 }
