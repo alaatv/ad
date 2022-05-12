@@ -21,18 +21,16 @@ class FetchAd extends Job
     private $adPicTransferrer;
     private $sourceName;
     private $since;
-    private $till;
 
     /**
      * Create a new job instance.
      *
      * @param string $sourceName
      */
-    public function __construct(string $sourceName, string $since, string $till)
+    public function __construct(string $sourceName, string $since)
     {
         $this->sourceName = $sourceName;
         $this->since = $since;
-        $this->till = $till;
     }
 
     /**
@@ -50,7 +48,7 @@ class FetchAd extends Job
         /** @var stdClass $source */
         $source = Repo::getRecords('sources', ['*'], ['name' => $this->sourceName])->first();
         if (isset($source)) {
-            [$donePages, $failedPages] = $this->fetch($source, $this->since, $this->till);
+            [$donePages, $failedPages] = $this->fetch($source, $this->since);
         }
     }
 
@@ -58,9 +56,9 @@ class FetchAd extends Job
      * @param stdClass $source
      * @return array
      */
-    private function fetch(stdClass $source, $since, $till): array
+    private function fetch(stdClass $source, $since): array
     {
-        $fetchUrl = (new SourceFetchUrlGenerator($source, $since, $till))->generateUrl();
+        $fetchUrl = (new SourceFetchUrlGenerator($source, $since))->generateUrl();
 
         if (is_null($fetchUrl)) {
             return [0, 0];

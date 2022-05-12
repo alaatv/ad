@@ -11,17 +11,15 @@ class SourceFetchUrlGenerator
 {
     private $source;
     private $since;
-    private $till;
 
     /**
      * SourceFetchUrlGenerator constructor.
      * @param $source
      */
-    public function __construct($source, $since, $till)
+    public function __construct($source, $since)
     {
         $this->source = $source;
         $this->since = $since;
-        $this->till = $till;
     }
 
     /**
@@ -29,6 +27,7 @@ class SourceFetchUrlGenerator
      */
     public function generateUrl(): ?string
     {
+        dd($this->source->name, $this->since);
         $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $this->source->id, 'completed_at' => null])
             ->orderByDesc('created_at')->first();
         $sourceFetchUrl = $this->source->fetch_url;
@@ -36,7 +35,6 @@ class SourceFetchUrlGenerator
             $sourceFetchUrl .= '?';
         }
 
-        //TODO: make sure if we can pass since and till dates to query string
         if (is_null($lastFetch)) {
             return $sourceFetchUrl . '&timestamp=' . Carbon::parse($this->since)->timestamp;
         }

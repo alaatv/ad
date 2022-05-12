@@ -12,7 +12,7 @@ class Fetching extends Command
      *
      * @var string
      */
-    protected $signature = 'ad:fetch {source : name of the source to be fetched} {--since=} {--till=}';
+    protected $signature = 'ad:fetch {source : name of the source to be fetched} {--since=}';
 
     /**
      * The console command description.
@@ -30,11 +30,7 @@ class Fetching extends Command
     {
         $sourceName = $this->argument('source');
         $since = $this->option('since');
-        $till = $this->option('till');
-        if ($this->confirm('Did you define since and till dates?')) {
-            dispatch(new FetchAd($sourceName, $since, $till));
-            return 0;
-        }
+        dispatch(new FetchAd($sourceName, $since));
         return 0;
     }
 }

@@ -27,11 +27,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $since = Carbon::now()->subMonths(3)->toDateString();
-        $till = Carbon::now()->toDateString();
-
+//        cron('0 0 * */3 *')
         //TODO: enter the exact sourceName of chibekhunam instead of test
-        $schedule->command(Fetching::class, ['test', '--since=' . $since, '--till=' . $till])
-            ->cron('0 0 * */3 *')->timezone('Asia/Tehran');
+        $schedule->command(Fetching::class, ['test', '--since=' . $since])
+            ->everyMinute()->timezone('Asia/Tehran');
     }
 
     /**
