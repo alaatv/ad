@@ -84,6 +84,11 @@ class FetchAd extends Job
             $this->insertOrUpdateFetch($source, $currentPage, $lastPage, $nextPageUrl);
             $fetchUrl = $nextPageUrl;
             $donePages++;
+            if ($currentPage === $lastPage) {
+                Repo::updateRecord('fetches', [
+                    'completed_at' => Carbon::now(),
+                ]);
+            }
         } while ($currentPage < $lastPage);
 
         return [$donePages, $failedPages];
@@ -137,7 +142,6 @@ class FetchAd extends Job
             'current_page' => $currentPage,
             'next_page_url' => $nextPageUrl,
             'updated_at' => Carbon::now(),
-            'completed_at' => Carbon::now(),
         ]);
     }
 

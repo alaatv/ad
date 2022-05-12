@@ -27,7 +27,6 @@ class SourceFetchUrlGenerator
      */
     public function generateUrl(): ?string
     {
-        dd($this->source->name, $this->since);
         $lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $this->source->id, 'completed_at' => null])
             ->orderByDesc('created_at')->first();
         $sourceFetchUrl = $this->source->fetch_url;
@@ -43,6 +42,6 @@ class SourceFetchUrlGenerator
             return $lastFetch->next_page_url;
         }
 
-        return $sourceFetchUrl . '&timestamp=' . Carbon::parse($lastFetch->completed_at)->timestamp;
+        return $sourceFetchUrl . '&timestamp=' . Carbon::parse($lastFetch->updated_at)->timestamp;
     }
 }
