@@ -95,7 +95,7 @@ class FetchAd extends Job
 
             $fetchUrl = $nextPageUrl;
             $donePages++;
-            if ($currentPage === $lastPage) {
+            if ($currentPage == $this->lastFetch->last_page) {
                 Repo::updateRecord('fetches', $this->lastFetch->id, [
                     'completed_at' => Carbon::now(),
                 ]);
