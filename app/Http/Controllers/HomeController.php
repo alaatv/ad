@@ -10,7 +10,6 @@ use App\Repositories\Repo;
 use App\Repositories\SourceRepo;
 use App\Traits\adTrait;
 use App\Traits\HTTPRequestTrait;
-use Carbon\Carbon;
 use Illuminate\{Http\JsonResponse, Http\Request, Http\Response, Support\Facades\DB};
 
 class HomeController extends Controller
@@ -60,13 +59,12 @@ class HomeController extends Controller
         $itemType = $request->input('item_type');
         $sourceName = $request->input('source');
         $source = Repo::getRecords('sources', ['*'], ['name' => $sourceName])->first();
-        $ad = Repo::getRecords('ads', ['*'], [$this->makeAdForeignId($source->id, $itemID, $itemType)])->first();
-
+        $ad = Repo::getRecords('ads', ['*'], ['foreign_id' => $this->makeAdForeignId($source->id, $itemID, $itemType),])->first();
         if (is_null($ad)) {
             return response()->json($this->setErrorResponse(myResponse::AD_NOT_FOUND, 'Ad not found'));
         }
 
-        $update = DB::table('ads')->update([
+        $update = DB::table('ads')->where('id', $ad->id)->update([
             'name' => $request->input('name', optional($ad)->name),
             'image' => $request->input('link', optional($ad)->link),
             'link' => $request->input('image', optional($ad)->image),
