@@ -9,6 +9,7 @@ use App\Classes\AdPicTransferrer;
 use App\Classes\SourceFetchUrlGenerator;
 use App\Repositories\Repo;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use stdClass;
 
 class FetchAd extends Job
@@ -21,6 +22,8 @@ class FetchAd extends Job
     private $adPicTransferrer;
     private $sourceName;
     private $since;
+    private $source;
+    private $lastFetch;
 
     /**
      * Create a new job instance.
@@ -31,6 +34,9 @@ class FetchAd extends Job
     {
         $this->sourceName = $sourceName;
         $this->since = $since;
+        $this->source = Repo::getRecords('sources', ['*'], ['name' => $this->sourceName])->first();
+        $this->lastFetch = Repo::getRecords('fetches', ['*'], ['source_id' => $this->source->id, 'completed_at' => null])
+            ->orderByDesc('created_at')->first();
     }
 
     /**
@@ -46,9 +52,8 @@ class FetchAd extends Job
         $this->adPicTransferrer = $adPicTransferrer;
 
         /** @var stdClass $source */
-        $source = Repo::getRecords('sources', ['*'], ['name' => $this->sourceName])->first();
-        if (isset($source)) {
-            [$donePages, $failedPages] = $this->fetch($source, $this->since);
+        if (isset($this->source)) {
+            [$donePages, $failedPages] = $this->fetch($this->source, $this->since);
         }
     }
 
@@ -78,36 +83,26 @@ class FetchAd extends Job
             if (empty($items)) {
                 continue;
             }
-
             $this->storeItems($source, $items, $counter);
 
-            $this->insertOrUpdateFetch($source, $currentPage, $lastPage, $nextPageUrl);
+            if ($currentPage == 1) {
+                $this->insertFetch($source->id, $currentPage, $lastPage, $nextPageUrl);
+                $this->lastFetch = DB::table('fetches')->where('source_id', $source->id)
+                    ->latest()->first();
+            } else {
+                $this->updateFetch($source->id, $currentPage, $nextPageUrl, $this->lastFetch->id);
+            }
+
             $fetchUrl = $nextPageUrl;
             $donePages++;
             if ($currentPage === $lastPage) {
-                Repo::updateRecord('fetches', [
+                Repo::updateRecord('fetches', $this->lastFetch->id, [
                     'completed_at' => Carbon::now(),
                 ]);
             }
         } while ($currentPage < $lastPage);
 
         return [$donePages, $failedPages];
-    }
-
-    /**
-     * @param stdClass $source
-     * @param $currentPage
-     * @param $lastPage
-     * @param $nextPageUrl
-     * @return bool
-     */
-    private function insertOrUpdateFetch(stdClass $source, $currentPage, $lastPage, $nextPageUrl): bool
-    {
-        if ($currentPage == 1) {
-            return $this->insertFetch($source->id, $currentPage, $lastPage, $nextPageUrl);
-        }
-
-        return $this->updateFetch($source->id, $currentPage, $nextPageUrl);
     }
 
     /**
@@ -135,9 +130,9 @@ class FetchAd extends Job
      * @param $nextPageUrl
      * @return bool
      */
-    private function updateFetch(int $sourceID, $currentPage, $nextPageUrl): bool
+    private function updateFetch(int $sourceID, $currentPage, $nextPageUrl, $fetch_id): bool
     {
-        return Repo::updateRecord('fetches', [
+        return Repo::updateRecord('fetches', $fetch_id, [
             'source_id' => $sourceID,
             'current_page' => $currentPage,
             'next_page_url' => $nextPageUrl,
