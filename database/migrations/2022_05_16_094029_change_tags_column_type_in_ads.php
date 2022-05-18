@@ -26,7 +26,7 @@ class ChangeTagsColumnTypeInAds extends Migration
     public function down()
     {
         Schema::table('ads', function (Blueprint $table) {
-            //
+            $table->string('tags')->nullable()->comment('تگ های تبلیغ')->change();
         });
     }
 }

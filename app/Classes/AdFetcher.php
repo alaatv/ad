@@ -30,9 +30,9 @@ class AdFetcher
         if ($response['statusCode'] == Response::HTTP_OK) {
             $done = true;
             $data = (isset($result->data)) ? $result->data : [];
-            $currentPage = optional($result)->current_page;
+            $currentPage = (int)optional($result)->current_page;
             $nextPageUrl = optional($result)->next_page_url;
-            $lastPage = optional($result)->last_page;
+            $lastPage = (int)optional($result)->last_page;
             $resultText = 'Fetched successfully';
         } else {
             $done = false;

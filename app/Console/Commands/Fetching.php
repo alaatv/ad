@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Classes\AdFetcher;
+use App\Classes\AdItemInserter;
+use App\Classes\AdPicTransferrer;
 use App\Jobs\FetchAd;
 use Illuminate\Console\Command;
 
@@ -26,11 +29,11 @@ class Fetching extends Command
      * Execute the console command.
      *
      */
-    public function handle(): int
+    public function handle(AdFetcher $adFetcher, AdItemInserter $adItemInserter, AdPicTransferrer $adPicTransferrer): int
     {
         $sourceName = $this->argument('source');
         $since = $this->option('since');
-        dispatch(new FetchAd($sourceName, $since));
+        dispatch(new FetchAd($sourceName, $since, $adFetcher, $adItemInserter, $adPicTransferrer));
         return 0;
     }
 }
