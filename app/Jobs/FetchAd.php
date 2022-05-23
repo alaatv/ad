@@ -55,7 +55,7 @@ class FetchAd extends Job
     {
         /** @var stdClass $source */
         if (isset($this->source)) {
-            $donePages = $this->fetch();
+            [$donePages, $failedPages] = $this->fetch();
         } else {
             Log::error('source is not set with name: ' . $this->sourceName);
             throw new Exception('source is not set with name: ' . $this->sourceName);
@@ -63,31 +63,43 @@ class FetchAd extends Job
     }
 
     /**
-     * @return int
+     * @return array
      */
-    private function fetch(): int
+    private function fetch(): array
     {
+        $sleepCount = 0;
         $fetchUrl = (new SourceFetchUrlGenerator($this->source, $this->since))->generateUrl();
 
         if (is_null($fetchUrl)) {
-            return 0;
+            return [0, 0];
         }
-
+        $failedPages = 0;
         $donePages = 0;
 
         do {
-            $counter = 0;
             [$fetchDone, $items, $currentPage, $nextPageUrl, $lastPage, $resultText] = $this->adFetcher->fetchAd($fetchUrl);
-            if (!$fetchDone) {
-                Log::error('response status code is not 200 | request url: ' . $fetchUrl);
-                throw new Exception('response status code is not 200 | request url: ' . $fetchUrl);
-            }
 
-            if (empty($items)) {
-                Log::error('response data is null | request url: ' . $fetchUrl);
-                throw new Exception('response data is null | request url: ' . $fetchUrl);
+            if (!$fetchDone) {
+                sleep(300);
+                $sleepCount++;
+                if ($sleepCount == 3) {
+                    Log::error('response status code is not 200 for page ' . $currentPage . ' | request url: ' . $fetchUrl);
+                    throw new Exception('response status code is not 200 for page ' . $currentPage . ' | request url: ' . $fetchUrl);
+                }
+                continue;
             }
-            $this->storeItems($this->source, $items, $counter);
+            if (empty($items) && isset($nextPageUrl)) {
+                $fetchUrl = $nextPageUrl;
+                Log::error('response data is null for page ' . $currentPage . ' | request url: ' . $fetchUrl);
+                $failedPages++;
+                continue;
+            }
+            if (empty($items) && !isset($lastPage)) {
+                Log::error('response data is null for last page : ' . $currentPage . ' | request url: ' . $fetchUrl);
+                $failedPages++;
+                break;
+            }
+            $this->storeItems($this->source, $items);
 
             if ($currentPage === 1) {
                 $this->insertFetch($this->source->id, $currentPage, $lastPage, $nextPageUrl);
@@ -106,7 +118,7 @@ class FetchAd extends Job
             }
         } while ($currentPage < $lastPage);
 
-        return $donePages;
+        return [$donePages, $failedPages];
     }
 
     /**
@@ -148,14 +160,11 @@ class FetchAd extends Job
     /**
      * @param stdClass $source
      * @param array $items
-     * @param int $counter
      */
-    private function storeItems(stdClass $source, array $items, int $counter): void
+    private function storeItems(stdClass $source, array $items): void
     {
         foreach ($items as $item) {
-            if ($this->adItemInserter->storeOrUpdateItem($source, $item, $this->adPicTransferrer)) {
-                $counter++;
-            }
+            $this->adItemInserter->storeOrUpdateItem($source, $item, $this->adPicTransferrer);
         }
     }
 }

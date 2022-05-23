@@ -21,16 +21,15 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     * @param Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
     {
         $since = Carbon::now()->subMonths(3)->toDateString();
-//        cron('0 0 * */3 *')
-        //TODO: enter the exact sourceName of chibekhunam instead of test
-        $schedule->command(Fetching::class, ['test', '--since=' . $since])
-            ->everyMinute()->timezone('Asia/Tehran');
+        //TODO: enter the exact sourceName of chibekhunam instead of source_name
+        $schedule->command(Fetching::class, ['source_name', '--since=' . $since])
+            ->cron('0 0 * */3 *')->timezone('Asia/Tehran');
     }
 
     /**
