@@ -67,24 +67,42 @@ class FetchAd extends Job
      */
     private function fetch(): array
     {
+        $row = 1;
         $sleepCount = 0;
         $fetchUrl = (new SourceFetchUrlGenerator($this->source, $this->since))->generateUrl();
+        $urls = [];
+        $failedPages = 0;
+        $donePages = 0;
 
         if (is_null($fetchUrl)) {
             return [0, 0];
         }
-        $failedPages = 0;
-        $donePages = 0;
 
         do {
             [$fetchDone, $items, $currentPage, $nextPageUrl, $lastPage, $resultText] = $this->adFetcher->fetchAd($fetchUrl);
-
-            if (!$fetchDone) {
+            if (!$fetchDone && $row == 1) {
                 sleep(300);
                 $sleepCount++;
                 if ($sleepCount == 3) {
                     Log::error('response status code is not 200 for page ' . $currentPage . ' | request url: ' . $fetchUrl);
                     throw new Exception('response status code is not 200 for page ' . $currentPage . ' | request url: ' . $fetchUrl);
+                }
+                continue;
+            }
+            if ($row == 1) {
+                for ($i = 1; $i <= $lastPage; $i++) {
+                    $urls[] = $this->source->fetch_url . '&page=' . $i;
+                }
+            }
+            if (!$fetchDone) {
+                sleep(300);
+                $sleepCount++;
+                if ($sleepCount == 3) {
+                    $sleepCount = 0;
+                    $failedPages++;
+                    Log::error('response status code is not 200 for page ' . $currentPage . ' | request url: ' . $fetchUrl);
+                    $fetchUrl = $urls[$currentPage + 1];
+                    continue;
                 }
                 continue;
             }
@@ -116,6 +134,7 @@ class FetchAd extends Job
                     'completed_at' => Carbon::now(),
                 ]);
             }
+            $row++;
         } while ($currentPage < $lastPage);
 
         return [$donePages, $failedPages];
