@@ -42,16 +42,15 @@ class AdPicTransferrer
      * @param string $filePath
      * @return
      */
-    public function transferAdPicToCDN(string $filePath): array
+    public function transferAdPicToMinio(string $filePath): array
     {
-        $disk = Storage::disk('adPicsSFTP');
+        $disk = Storage::disk('adsMinio');
         $fileName = basename($filePath);
         $url = null;
         $done = false;
 
-        //TODO : login to filesystem in production ENV (set correct username and host)
-        if ($disk->put($fileName, File::get(storage_path($filePath)))) {
-            $url = config('download_server.IMAGES_PARTIAL_PATH') . '/' . $fileName;
+        if ($disk->put('/images/tabligh/' . $fileName, File::get(storage_path($filePath)))) {
+            $url = $fileName;
             $done = true;
             Storage::disk('adImage')->delete($fileName);
         }

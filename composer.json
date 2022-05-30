@@ -10,6 +10,7 @@
     "type": "project",
     "require": {
         "php": "^8.0",
+        "coraxster/flysystem-aws-s3-v3-minio": "^1.0",
         "doctrine/dbal": "^3.3",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",

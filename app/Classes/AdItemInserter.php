@@ -29,7 +29,7 @@ class AdItemInserter
             return false;
         }
 
-        [$isPicTransferred, $picUrl] = $this->putAdPicToCDN($item, $adPicTransferrer);
+        [$isPicTransferred, $picUrl] = $this->putAdPicToMinio($item, $adPicTransferrer);
 
         $item->image = null;
         $item->enable = 0;
@@ -106,13 +106,13 @@ class AdItemInserter
      * @param AdPicTransferrer $adPicTransferrer
      * @return array
      */
-    private function putAdPicToCDN($item, AdPicTransferrer $adPicTransferrer): array
+    private function putAdPicToMinio($item, AdPicTransferrer $adPicTransferrer): array
     {
         $isPicTransferred = false;
         $picUrl = null;
         [$storeResult, $picPath] = $adPicTransferrer->storeAdPic(optional($item)->image);
         if ($storeResult) {
-            [$isPicTransferred, $picUrl] = $adPicTransferrer->transferAdPicToCDN($picPath);
+            [$isPicTransferred, $picUrl] = $adPicTransferrer->transferAdPicToMinio($picPath);
         }
         return [$isPicTransferred, $picUrl];
     }
