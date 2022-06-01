@@ -7,6 +7,8 @@ namespace App\Classes;
 use App\Repositories\Repo;
 use App\Traits\adTrait;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use stdClass;
 
@@ -19,17 +21,17 @@ class AdItemInserter
     /**
      * @param stdClass $source
      * @param $item
-     * @param AdPicTransferrer $adPicTransferrer
+     * @param AdImageUtil $adImageUtil
      * @return bool
      */
-    public function storeOrUpdateItem(stdClass $source, $item, AdPicTransferrer $adPicTransferrer): bool
+    public function storeOrUpdateItem(stdClass $source, $item, AdImageUtil $adImageUtil): bool
     {
         $this->source = $source;
         if (!$this->isValidItem($item)) {
             return false;
         }
 
-        [$isPicTransferred, $picUrl] = $this->putAdPicToMinio($item, $adPicTransferrer);
+        [$isPicTransferred, $picUrl] = $this->putAdPicToMinio($item, $adImageUtil);
 
         $item->image = null;
         $item->enable = 0;
@@ -103,17 +105,23 @@ class AdItemInserter
 
     /**
      * @param $item
-     * @param AdPicTransferrer $adPicTransferrer
+     * @param AdImageUtil $adImageUtil
      * @return array
      */
-    private function putAdPicToMinio($item, AdPicTransferrer $adPicTransferrer): array
+    private function putAdPicToMinio($item, AdImageUtil $adImageUtil): array
     {
-        $isPicTransferred = false;
-        $picUrl = null;
-        [$storeResult, $picPath] = $adPicTransferrer->storeAdPic(optional($item)->image);
-        if ($storeResult) {
-            [$isPicTransferred, $picUrl] = $adPicTransferrer->transferAdPicToMinio($picPath);
+        try {
+            if (!isset($item->image))
+                return [false, null];
+            $file = file_get_contents($item->image);
+            if ($adImageUtil->setFileName($item->image)->uploadImageToMinio($file)) {
+                $url = $adImageUtil->fileName;
+                return [true, $url];
+            }
+            return [false, null];
+        } catch (Exception $exception) {
+            Log::error('image is not stored in local | ' . $exception->getMessage());
+            return [false, null];
         }
-        return [$isPicTransferred, $picUrl];
     }
 }

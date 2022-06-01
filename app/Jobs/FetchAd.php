@@ -4,8 +4,8 @@
 namespace App\Jobs;
 
 use App\Classes\AdFetcher;
+use App\Classes\AdImageUtil;
 use App\Classes\AdItemInserter;
-use App\Classes\AdPicTransferrer;
 use App\Classes\SourceFetchUrlGenerator;
 use App\Repositories\Repo;
 use Carbon\Carbon;
@@ -20,8 +20,8 @@ class FetchAd extends Job
     private AdFetcher $adFetcher;
     /** @var AdItemInserter $adItemInserter */
     private AdItemInserter $adItemInserter;
-    /** @var AdPicTransferrer $adPicTransferrer */
-    private AdPicTransferrer $adPicTransferrer;
+    /** @var AdImageUtil $adImageUtil */
+    private AdImageUtil $adImageUtil;
     private string $sourceName;
     private string $since;
     private null|object $source;
@@ -34,9 +34,9 @@ class FetchAd extends Job
      * @param string $since
      * @param AdFetcher $adFetcher
      * @param AdItemInserter $adItemInserter
-     * @param AdPicTransferrer $adPicTransferrer
+     * @param AdImageUtil $adImageUtil
      */
-    public function __construct(string $sourceName, string $since, AdFetcher $adFetcher, AdItemInserter $adItemInserter, AdPicTransferrer $adPicTransferrer)
+    public function __construct(string $sourceName, string $since, AdFetcher $adFetcher, AdItemInserter $adItemInserter, AdImageUtil $adImageUtil)
     {
         $this->sourceName = $sourceName;
         $this->since = $since;
@@ -45,7 +45,7 @@ class FetchAd extends Job
             ->orderByDesc('created_at')->first();
         $this->adFetcher = $adFetcher;
         $this->adItemInserter = $adItemInserter;
-        $this->adPicTransferrer = $adPicTransferrer;
+        $this->adImageUtil = $adImageUtil;
     }
 
     /**
@@ -183,7 +183,7 @@ class FetchAd extends Job
     private function storeItems(stdClass $source, array $items): void
     {
         foreach ($items as $item) {
-            $this->adItemInserter->storeOrUpdateItem($source, $item, $this->adPicTransferrer);
+            $this->adItemInserter->storeOrUpdateItem($source, $item, $this->adImageUtil);
         }
     }
 }
