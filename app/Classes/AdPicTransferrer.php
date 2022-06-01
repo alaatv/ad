@@ -3,19 +3,21 @@
 
 namespace App\Classes;
 
-
-use App\Traits\HTTPRequestTrait;
 use Exception;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
+use JetBrains\PhpStorm\Pure;
 
 class AdPicTransferrer
 {
-    use HTTPRequestTrait;
+    protected AdImageUtil $adImageUtil;
+
+    #[Pure] public function __construct()
+    {
+        $this->adImageUtil = new AdImageUtil;
+    }
 
     /**
-     * @param string $picUrl
+     * @param string|null $picUrl
      * @return array
      */
     public function storeAdPic(string $picUrl = null): array
@@ -24,35 +26,30 @@ class AdPicTransferrer
             if (!isset($picUrl))
                 return [false, null];
 
-            $pathToSave = Storage::disk('adImage')->putFileAs('', $picUrl, basename($picUrl));
-            $filePath = fopen(storage_path('app/public/images/ads/') . $pathToSave, 'w+');
-
-            $response = $this->sendRequest($picUrl, 'GET', null, null, $filePath);
-            if ($response['statusCode'] == Response::HTTP_OK) {
-                return [true, 'app/public/images/ads/' . $pathToSave];
+            $isPicLoaded = $this->adImageUtil->setFileName($picUrl)->uploadImageToLocal($picUrl)
+                ->getImageLocalFullPath()->testImageLoading($picUrl);
+            if ($isPicLoaded) {
+                return [true, 'app/public/images/ads/' . $this->adImageUtil->pathToSave];
             }
             return [false, null];
-
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
+            Log::error('image is not stored in local | ' . $exception->getMessage());
             return [false, null];
         }
     }
 
     /**
      * @param string $filePath
-     * @return
+     * @return array
      */
     public function transferAdPicToMinio(string $filePath): array
     {
-        $disk = Storage::disk('adsMinio');
-        $fileName = basename($filePath);
         $url = null;
         $done = false;
-
-        if ($disk->put('/images/tabligh/' . $fileName, File::get(storage_path($filePath)))) {
-            $url = $fileName;
+        if ($this->adImageUtil->setFileName($filePath)->uploadImageToMinio($filePath)) {
+            $url = $this->adImageUtil->fileName;
             $done = true;
-            Storage::disk('adImage')->delete($fileName);
+            $this->adImageUtil->deleteImageFromLocal($this->adImageUtil->fileName);
         }
         return [$done, $url];
     }

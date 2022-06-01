@@ -22,6 +22,6 @@ class AdPicLinkGenerator
 
     public function generatePicLink(): string
     {
-        return Storage::disk('adsMinio')->url('images/tabligh/' . $this->ad->image);
+        return Storage::disk('adsMinio')->url($this->ad->image);
     }
 }

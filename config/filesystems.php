@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DRIVER', 'local'),
+    'default' => env('FILESYSTEM_DRIVER', 'adImageLocal'),
 
     /*
     |--------------------------------------------------------------------------
@@ -29,7 +29,7 @@ return [
     */
 
 
-    'cloud' => env('FILESYSTEM_CLOUD', 's3'),
+    'cloud' => env('FILESYSTEM_CLOUD', 'adImageMinio'),
 
     /*
     |--------------------------------------------------------------------------
@@ -45,13 +45,13 @@ return [
     */
 
     'disks' => [
-        'adImage' => [
+        'adImageLocal' => [
             'driver' => 'local',
             'root' => storage_path('app/public/images/ads'),
             'visibility' => 'public',
         ],
 
-        'adsMinio' => [
+        'adImageMinio' => [
             'driver' => 's3',
             'endpoint' => env('MINIO_ENDPOINT', 'http://minio:9000'),
             'use_path_style_endpoint' => true,
@@ -59,7 +59,7 @@ return [
             'secret' => env('AWS_SECRET'),
             'region' => env('AWS_REGION'),
             'bucket' => env('AWS_PUBLIC_BUCKET', 'upload'),
-            'path' => '/images/tabligh/',
+            'root' => env('AWS_PREFIX', env('APP_ENV') . '/'),
         ],
     ],
 
