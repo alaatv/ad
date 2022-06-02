@@ -4,7 +4,6 @@
 namespace App\Classes;
 
 
-use App\Adapter\AlaaSftpAdapter;
 use Illuminate\Support\Facades\Storage;
 use stdClass;
 
@@ -21,9 +20,8 @@ class AdPicLinkGenerator
         $this->ad = $ad;
     }
 
-    public function generatePicLink() :string {
-        /** @var AlaaSftpAdapter $diskAdapter */
-        $diskAdapter = Storage::disk('alaaCdnSFTP')->getAdapter();
-        return $diskAdapter->getUrl(optional($this->ad)->image);
+    public function generatePicLink(): string
+    {
+        return Storage::disk('adImageMinio')->url($this->ad->image);
     }
 }

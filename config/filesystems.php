@@ -45,48 +45,44 @@ return [
     */
 
     'disks' => [
-        'adImage' => [
-            'driver'     => 'local',
-            'root'       => storage_path('app/public/images/ads'),
+        'local' => [
+            'driver' => 'local',
+            'root' => storage_path('app'),
+        ],
+
+        'public' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public'),
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
 
-        'adPicsSFTP'     => [
-            'driver'     => 'sftp',
-            'host'       => env('SFTP_HOST', ''),
-            'port'       => env('SFTP_PORT', '22'),
-            'username'   => env('SFTP_USERNAME', ''),
-            'password'   => env('SFTP_PASSSWORD', ''),
-            'privateKey' => env('SFTP_PRIVATE_KEY_PATH', ''),
-            'root'       => env('SFTP_ROOT','').env('DOWNLOAD_SERVER_IMAGES_PARTIAL_PATH',''),
-            'timeout'    => env('SFTP_TIMEOUT', '10'),
-            'prefix'     => null,
-            'dHost'      => env('DOWNLOAD_SERVER_NAME',''),
-            'dProtocol'  => env('DOWNLOAD_SERVER_PROTOCOL',''),
+        'adImageLocal' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/images/ads'),
+            'visibility' => 'public',
         ],
 
-        'alaaCdnSFTP'     => [
-            'driver'     => 'sftp',
-            'host'       => env('SFTP_HOST', ''),
-            'port'       => env('SFTP_PORT', '22'),
-            'username'   => env('SFTP_USERNAME', ''),
-            'password'   => env('SFTP_PASSSWORD', ''),
-            'privateKey' => env('SFTP_PRIVATE_KEY_PATH', ''),
-            'root'       => env('SFTP_ROOT',''),
-            'timeout'    => env('SFTP_TIMEOUT', '10'),
-            'prefix'     => null,
-            'dHost'      => "cdn.alaatv.com",
-            'dProtocol'  => "https://",
+        'adImageMinio' => [
+            'driver' => 's3',
+            'endpoint' => env('MINIO_ENDPOINT', 'http://minio:9000'),
+            'use_path_style_endpoint' => true,
+            'key' => env('AWS_KEY'),
+            'secret' => env('AWS_SECRET'),
+            'region' => env('AWS_REGION'),
+            'bucket' => env('AWS_PUBLIC_BUCKET', 'upload'),
+            'root' => env('AWS_PREFIX', env('APP_ENV') . '/'),
         ],
-
 
         's3' => [
             'driver' => 's3',
-            'key'    => env('AWS_ACCESS_KEY_ID'),
+            'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'region' => env('AWS_DEFAULT_REGION'),
             'bucket' => env('AWS_BUCKET'),
-            'url'    => env('AWS_URL'),
+            'url' => env('AWS_URL'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
         ],
     ],
 

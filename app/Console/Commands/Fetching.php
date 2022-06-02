@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Classes\AdFetcher;
+use App\Classes\AdImageUtil;
+use App\Classes\AdItemInserter;
 use App\Jobs\FetchAd;
 use Illuminate\Console\Command;
 
@@ -12,24 +15,25 @@ class Fetching extends Command
      *
      * @var string
      */
-    protected $signature = 'ad:fetch {source : name of the source to be fetched}';
+    protected $signature = 'ad:fetch {source : name of the source to be fetched} {--since=}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Fetiching ads from a source';
+    protected $description = 'Fetching ads from a source';
 
 
     /**
      * Execute the console command.
      *
      */
-    public function handle(): int
+    public function handle(AdFetcher $adFetcher, AdItemInserter $adItemInserter, AdImageUtil $adImageUtil): int
     {
         $sourceName = $this->argument('source');
-        dispatch(new FetchAd($sourceName));
+        $since = $this->option('since');
+        dispatch(new FetchAd($sourceName, $since, $adFetcher, $adItemInserter, $adImageUtil));
         return 0;
     }
 }
